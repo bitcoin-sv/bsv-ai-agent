@@ -1,4 +1,4 @@
-# BSV-AI-Agent
+# BSV AI Agent
 
 ## Description
 
