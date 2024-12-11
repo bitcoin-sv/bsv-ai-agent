@@ -2,9 +2,11 @@
 
 ## Description
 
-Create an open-source faucet service offering small amounts of digital tokens for testing purposes on the BSV Blockchain. This service aids developers and testers in their work without requiring them to acquire real digital currencies. It's applicable to non-production environments such as testnet.
+The BSV-AI Synergy Platform is an experimental and adaptable initiative that combines the BSV blockchain's scalability, transparency and micropayments capability with AI's automated, analytical and generative capabilities.
 
-A testnet faucet provides users with free testnet tokens for testing and development. This allows developers to test their applications and smart contracts before deploying them to the main network.
+This project allows innovators to develop a variety of application scenarios that demonstrate the synergistic potential of the BSV Blockchain and AI.
+
+This hackathon project invites participants to experiment with creative and impactful solutions, showcasing how BSV blockchain and AI can work together to solve critical problems in areas like data integrity, security, micropayments and beyond.
 
 ## Introduction
 
