@@ -44,9 +44,12 @@ Bitcoin SV (BSV) is a blockchain that aims to maintain the original vision of Bi
 - ORM - Prisma
 - Deployment - Vercel
 - Styling - Tailwind CSS
-- Components - Shadcn UI
 - Analytics - Vercel Analytics
-- Formatting - Prettier
+- Code Formatting/Linting - Biome
+- BrianAPI 
+- LangChain
+- BSV-SDK
+- 
 
 This uses the new Next.js App Router. This includes support for enhanced layouts, colocation of components, tests, and styles, component-level data fetching, and more.
 
