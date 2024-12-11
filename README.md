@@ -22,6 +22,11 @@ Bitcoin SV (BSV) is a blockchain that aims to maintain the original vision of Bi
 - [Quick Start](https://docs.bsvblockchain.org/intro/quick-start)
 - [BSV Tools and Libraries](https://www.bsvblockchain.org/features/tools-libraries)
 
+
+#### AI Quick Start
+- [BrianAPI](https://docs.brianknows.org/brian-api/apis)
+- [LangChain](https://js.langchain.com/docs/introduction/)
+
 - [Bitcoin SV Website](https://bitcoinsv.io/)
 - [Bitcoin SV Wiki](https://en.wikipedia.org/wiki/Bitcoin_SV)
 - [BSV Developer Documentation](https://docs.bitcoinsv.io/)
@@ -34,6 +39,8 @@ Bitcoin SV (BSV) is a blockchain that aims to maintain the original vision of Bi
 
 - [Official BSV SDK](https://github.com/bitcoin-sv/ts-sdk) maintained by the BSV Association with zero dependencies.
 - [Bitcoin SV Lib](https://github.com/moneybutton/bsv) - A pure and powerful JavaScript Bitcoin SV library. A fork of BitPay's bitcore-lib-cash, but for Bitcoin SV only. Maintained by Yours Inc.
+
+
 
 #### Application Technology Stack
 
