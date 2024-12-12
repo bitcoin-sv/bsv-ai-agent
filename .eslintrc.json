@@ -1,13 +1,3 @@
 {
-  "env": {
-    "browser": true,
-    "es2021": true
-  },
-  "extends": "eslint:recommended",
-  "parserOptions": {
-    "ecmaVersion": 12
-  },
-  "rules": {
-    // Add any specific rules you want to keep or modify
-  }
+  "extends": "next/core-web-vitals"
 }

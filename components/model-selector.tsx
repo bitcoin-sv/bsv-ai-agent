@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import {
   Select,
@@ -7,37 +7,40 @@ import {
   SelectItem,
   SelectLabel,
   SelectTrigger,
-  SelectValue
-} from './ui/select'
-import Image from 'next/image'
-import { Model, models } from '@/lib/types/models'
-import { createModelId } from '@/lib/utils'
+  SelectValue,
+} from './ui/select';
+import Image from 'next/image';
+import { Model, models } from '@/lib/types/models';
+import { createModelId } from '@/lib/utils';
 
 interface ModelSelectorProps {
-  selectedModelId: string
-  onModelChange: (id: string) => void
+  selectedModelId: string;
+  onModelChange: (id: string) => void;
 }
 
 function groupModelsByProvider(models: Model[]) {
-  return models.reduce((groups, model) => {
-    const provider = model.provider
-    if (!groups[provider]) {
-      groups[provider] = []
-    }
-    groups[provider].push(model)
-    return groups
-  }, {} as Record<string, Model[]>)
+  return models.reduce(
+    (groups, model) => {
+      const provider = model.provider;
+      if (!groups[provider]) {
+        groups[provider] = [];
+      }
+      groups[provider].push(model);
+      return groups;
+    },
+    {} as Record<string, Model[]>
+  );
 }
 
 export function ModelSelector({
   selectedModelId,
-  onModelChange
+  onModelChange,
 }: ModelSelectorProps) {
   const handleModelChange = (id: string) => {
-    onModelChange(id)
-  }
+    onModelChange(id);
+  };
 
-  const groupedModels = groupModelsByProvider(models)
+  const groupedModels = groupModelsByProvider(models);
 
   return (
     <div className="absolute -top-8 left-2">
@@ -55,7 +58,7 @@ export function ModelSelector({
               <SelectLabel className="text-xs sticky top-0 bg-background z-10">
                 {provider}
               </SelectLabel>
-              {models.map(model => (
+              {models.map((model) => (
                 <SelectItem
                   key={createModelId(model)}
                   value={createModelId(model)}
@@ -78,5 +81,5 @@ export function ModelSelector({
         </SelectContent>
       </Select>
     </div>
-  )
+  );
 }

@@ -1,7 +1,7 @@
-'use client'
+'use client';
 
-import React from 'react'
-import { Skeleton } from './ui/skeleton'
+import React from 'react';
+import { Skeleton } from './ui/skeleton';
 
 export const DefaultSkeleton = () => {
   return (
@@ -9,5 +9,5 @@ export const DefaultSkeleton = () => {
       <Skeleton className="h-6 w-48" />
       <Skeleton className="w-full h-6" />
     </div>
-  )
-}
+  );
+};

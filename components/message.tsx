@@ -1,35 +1,35 @@
-'use client'
+'use client';
 
-import { MemoizedReactMarkdown } from './ui/markdown'
-import rehypeExternalLinks from 'rehype-external-links'
-import remarkGfm from 'remark-gfm'
-import remarkMath from 'remark-math'
-import rehypeKatex from 'rehype-katex'
-import 'katex/dist/katex.min.css'
-import { CodeBlock } from './ui/codeblock'
+import { MemoizedReactMarkdown } from './ui/markdown';
+import rehypeExternalLinks from 'rehype-external-links';
+import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import 'katex/dist/katex.min.css';
+import { CodeBlock } from './ui/codeblock';
 
 export function BotMessage({ content }: { content: string }) {
   // Check if the content contains LaTeX patterns
   const containsLaTeX = /\\\[([\s\S]*?)\\\]|\\\(([\s\S]*?)\\\)/.test(
     content || ''
-  )
+  );
 
   // Modify the content to render LaTeX equations if LaTeX patterns are found
-  const processedData = preprocessLaTeX(content || '')
+  const processedData = preprocessLaTeX(content || '');
 
   if (containsLaTeX) {
     return (
       <MemoizedReactMarkdown
         rehypePlugins={[
           [rehypeExternalLinks, { target: '_blank' }],
-          [rehypeKatex]
+          [rehypeKatex],
         ]}
         remarkPlugins={[remarkGfm, remarkMath]}
         className="prose-sm prose-neutral prose-a:text-accent-foreground/50"
       >
         {processedData}
       </MemoizedReactMarkdown>
-    )
+    );
   }
 
   return (
@@ -43,20 +43,20 @@ export function BotMessage({ content }: { content: string }) {
             if (children[0] == '▍') {
               return (
                 <span className="mt-1 cursor-default animate-pulse">▍</span>
-              )
+              );
             }
 
-            children[0] = (children[0] as string).replace('`▍`', '▍')
+            children[0] = (children[0] as string).replace('`▍`', '▍');
           }
 
-          const match = /language-(\w+)/.exec(className || '')
+          const match = /language-(\w+)/.exec(className || '');
 
           if (inline) {
             return (
               <code className={className} {...props}>
                 {children}
               </code>
-            )
+            );
           }
 
           return (
@@ -66,13 +66,13 @@ export function BotMessage({ content }: { content: string }) {
               value={String(children).replace(/\n$/, '')}
               {...props}
             />
-          )
-        }
+          );
+        },
       }}
     >
       {content}
     </MemoizedReactMarkdown>
-  )
+  );
 }
 
 // Preprocess LaTeX equations to be rendered by KaTeX
@@ -81,10 +81,10 @@ const preprocessLaTeX = (content: string) => {
   const blockProcessedContent = content.replace(
     /\\\[([\s\S]*?)\\\]/g,
     (_, equation) => `$$${equation}$$`
-  )
+  );
   const inlineProcessedContent = blockProcessedContent.replace(
     /\\\(([\s\S]*?)\\\)/g,
     (_, equation) => `$${equation}$`
-  )
-  return inlineProcessedContent
-}
+  );
+  return inlineProcessedContent;
+};

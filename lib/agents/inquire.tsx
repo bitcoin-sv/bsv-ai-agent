@@ -1,18 +1,18 @@
-import { Copilot } from '@/components/copilot'
-import { createStreamableUI, createStreamableValue } from 'ai/rsc'
-import { CoreMessage, streamObject } from 'ai'
-import { PartialInquiry, inquirySchema } from '@/lib/schema/inquiry'
-import { getModel } from '../utils/registry'
+import { Copilot } from '@/components/copilot';
+import { createStreamableUI, createStreamableValue } from 'ai/rsc';
+import { CoreMessage, streamObject } from 'ai';
+import { PartialInquiry, inquirySchema } from '@/lib/schema/inquiry';
+import { getModel } from '../utils/registry';
 
 export async function inquire(
   uiStream: ReturnType<typeof createStreamableUI>,
   messages: CoreMessage[],
   model: string
 ) {
-  const objectStream = createStreamableValue<PartialInquiry>()
-  uiStream.update(<Copilot inquiry={objectStream.value} />)
+  const objectStream = createStreamableValue<PartialInquiry>();
+  uiStream.update(<Copilot inquiry={objectStream.value} />);
 
-  let finalInquiry: PartialInquiry = {}
+  let finalInquiry: PartialInquiry = {};
 
   const result = await streamObject({
     model: getModel(model),
@@ -54,19 +54,19 @@ export async function inquire(
     Please match the language of the response (question, labels, inputLabel, and inputPlaceholder) to the user's language, but keep the "value" field in English.
     `,
     messages,
-    schema: inquirySchema
-  })
+    schema: inquirySchema,
+  });
 
   try {
     for await (const obj of result.partialObjectStream) {
       if (obj) {
-        objectStream.update(obj)
-        finalInquiry = obj
+        objectStream.update(obj);
+        finalInquiry = obj;
       }
     }
   } finally {
-    objectStream.done()
+    objectStream.done();
   }
 
-  return finalInquiry
+  return finalInquiry;
 }

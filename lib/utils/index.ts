@@ -1,9 +1,9 @@
-import { type ClassValue, clsx } from 'clsx'
-import { twMerge } from 'tailwind-merge'
-import { CoreMessage } from 'ai'
-import { type Model } from '@/lib/types/models'
+import { type ClassValue, clsx } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+import { CoreMessage } from 'ai';
+import { type Model } from '@/lib/types/models';
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
 }
 
 /**
@@ -15,16 +15,16 @@ export function cn(...inputs: ClassValue[]) {
  * @returns modifiedMessages - Array of modified messages
  */
 export function transformToolMessages(messages: CoreMessage[]): CoreMessage[] {
-  return messages.map(message =>
+  return messages.map((message) =>
     message.role === 'tool'
       ? {
           ...message,
           role: 'assistant',
           content: JSON.stringify(message.content),
-          type: 'tool'
+          type: 'tool',
         }
       : message
-  ) as CoreMessage[]
+  ) as CoreMessage[];
 }
 
 /**
@@ -33,16 +33,16 @@ export function transformToolMessages(messages: CoreMessage[]): CoreMessage[] {
  * @returns The sanitized URL
  */
 export function sanitizeUrl(url: string): string {
-  return url.replace(/\s+/g, '%20')
+  return url.replace(/\s+/g, '%20');
 }
 
 export function createModelId(model: Model): string {
-  return `${model.providerId}:${model.id}`
+  return `${model.providerId}:${model.id}`;
 }
 
 export function getDefaultModelId(models: Model[]): string {
   if (!models.length) {
-    throw new Error('No models available')
+    throw new Error('No models available');
   }
-  return createModelId(models[0])
+  return createModelId(models[0]);
 }

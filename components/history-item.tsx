@@ -1,41 +1,41 @@
-'use client'
+'use client';
 
-import React from 'react'
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { Chat } from '@/lib/types'
-import { cn } from '@/lib/utils'
+import React from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { Chat } from '@/lib/types';
+import { cn } from '@/lib/utils';
 
 type HistoryItemProps = {
-  chat: Chat
-}
+  chat: Chat;
+};
 
 const formatDateWithTime = (date: Date | string) => {
-  const parsedDate = new Date(date)
-  const now = new Date()
-  const yesterday = new Date()
-  yesterday.setDate(yesterday.getDate() - 1)
+  const parsedDate = new Date(date);
+  const now = new Date();
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
 
   const formatTime = (date: Date) => {
     return date.toLocaleString('en-US', {
       hour: '2-digit',
       minute: '2-digit',
-      hour12: true
-    })
-  }
+      hour12: true,
+    });
+  };
 
   if (
     parsedDate.getDate() === now.getDate() &&
     parsedDate.getMonth() === now.getMonth() &&
     parsedDate.getFullYear() === now.getFullYear()
   ) {
-    return `Today, ${formatTime(parsedDate)}`
+    return `Today, ${formatTime(parsedDate)}`;
   } else if (
     parsedDate.getDate() === yesterday.getDate() &&
     parsedDate.getMonth() === yesterday.getMonth() &&
     parsedDate.getFullYear() === yesterday.getFullYear()
   ) {
-    return `Yesterday, ${formatTime(parsedDate)}`
+    return `Yesterday, ${formatTime(parsedDate)}`;
   } else {
     return parsedDate.toLocaleString('en-US', {
       year: 'numeric',
@@ -43,14 +43,14 @@ const formatDateWithTime = (date: Date | string) => {
       day: '2-digit',
       hour: '2-digit',
       minute: '2-digit',
-      hour12: true
-    })
+      hour12: true,
+    });
   }
-}
+};
 
 const HistoryItem: React.FC<HistoryItemProps> = ({ chat }) => {
-  const pathname = usePathname()
-  const isActive = pathname === chat.path
+  const pathname = usePathname();
+  const isActive = pathname === chat.path;
 
   return (
     <Link
@@ -67,7 +67,7 @@ const HistoryItem: React.FC<HistoryItemProps> = ({ chat }) => {
         {formatDateWithTime(chat.createdAt)}
       </div>
     </Link>
-  )
-}
+  );
+};
 
-export default HistoryItem
+export default HistoryItem;

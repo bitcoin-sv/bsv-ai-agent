@@ -1,24 +1,24 @@
 // Referenced from Vercel's AI Chatbot and modified to fit the needs of this project
 // https://github.com/vercel/ai-chatbot/blob/c2757f87f986b7f15fdf75c4c89cb2219745c53f/components/ui/codeblock.tsx
 
-'use client'
+'use client';
 
-import { FC, memo } from 'react'
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
-import { coldarkDark } from 'react-syntax-highlighter/dist/cjs/styles/prism'
+import { FC, memo } from 'react';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { coldarkDark } from 'react-syntax-highlighter/dist/cjs/styles/prism';
 
-import { useCopyToClipboard } from '@/lib/hooks/use-copy-to-clipboard'
-import { Button } from '@/components/ui/button'
-import { generateId } from 'ai'
-import { Check, Copy, Download } from 'lucide-react'
+import { useCopyToClipboard } from '@/lib/hooks/use-copy-to-clipboard';
+import { Button } from '@/components/ui/button';
+import { generateId } from 'ai';
+import { Check, Copy, Download } from 'lucide-react';
 
 interface Props {
-  language: string
-  value: string
+  language: string;
+  value: string;
 }
 
 interface languageMap {
-  [key: string]: string | undefined
+  [key: string]: string | undefined;
 }
 
 export const programmingLanguages: languageMap = {
@@ -44,42 +44,42 @@ export const programmingLanguages: languageMap = {
   shell: '.sh',
   sql: '.sql',
   html: '.html',
-  css: '.css'
+  css: '.css',
   // add more file extensions here, make sure the key is same as language prop in CodeBlock.tsx component
-}
+};
 
 const CodeBlock: FC<Props> = memo(({ language, value }) => {
-  const { isCopied, copyToClipboard } = useCopyToClipboard({ timeout: 2000 })
+  const { isCopied, copyToClipboard } = useCopyToClipboard({ timeout: 2000 });
 
   const downloadAsFile = () => {
     if (typeof window === 'undefined') {
-      return
+      return;
     }
-    const fileExtension = programmingLanguages[language] || '.file'
-    const suggestedFileName = `file-${generateId()}${fileExtension}`
-    const fileName = window.prompt('Enter file name' || '', suggestedFileName)
+    const fileExtension = programmingLanguages[language] || '.file';
+    const suggestedFileName = `file-${generateId()}${fileExtension}`;
+    const fileName = window.prompt('Enter file name' || '', suggestedFileName);
 
     if (!fileName) {
       // User pressed cancel on prompt.
-      return
+      return;
     }
 
-    const blob = new Blob([value], { type: 'text/plain' })
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.download = fileName
-    link.href = url
-    link.style.display = 'none'
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-    URL.revokeObjectURL(url)
-  }
+    const blob = new Blob([value], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.download = fileName;
+    link.href = url;
+    link.style.display = 'none';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
 
   const onCopy = () => {
-    if (isCopied) return
-    copyToClipboard(value)
-  }
+    if (isCopied) return;
+    copyToClipboard(value);
+  };
 
   return (
     <div className="relative w-full font-sans codeblock bg-neutral-800">
@@ -119,23 +119,23 @@ const CodeBlock: FC<Props> = memo(({ language, value }) => {
           margin: 0,
           width: '100%',
           background: 'transparent',
-          padding: '1.5rem 1rem'
+          padding: '1.5rem 1rem',
         }}
         lineNumberStyle={{
-          userSelect: 'none'
+          userSelect: 'none',
         }}
         codeTagProps={{
           style: {
             fontSize: '0.9rem',
-            fontFamily: 'var(--font-mono)'
-          }
+            fontFamily: 'var(--font-mono)',
+          },
         }}
       >
         {value}
       </SyntaxHighlighter>
     </div>
-  )
-})
-CodeBlock.displayName = 'CodeBlock'
+  );
+});
+CodeBlock.displayName = 'CodeBlock';
 
-export { CodeBlock }
+export { CodeBlock };
