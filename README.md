@@ -1,8 +1,8 @@
-# BSV-AI
+# BSV AI Agent
 
 ## Description
 
-The BSV-AI Synergy Platform is an experimental and adaptable initiative that combines the BSV blockchain's scalability, transparency and micropayments capability with AI's automated, analytical and generative capabilities.
+The BSV Blockchain AI Agent is an innovative platform designed to simplify and revolutionize how users interact with the Bitcoin SV blockchain. By leveraging advanced natural language processing capabilities, the AI Agent abstracts the complexity of blockchain transactions and empowers users to perform a wide array of on-chain activities using simple, intuitive prompts.
 
 This project allows innovators to develop a variety of application scenarios that demonstrate the synergistic potential of the BSV Blockchain and AI.
 
@@ -27,6 +27,8 @@ Bitcoin SV (BSV) is a blockchain that aims to maintain the original vision of Bi
 - [BrianAPI](https://docs.brianknows.org/brian-api/apis)
 - [LangChain](https://js.langchain.com/docs/introduction/)
 
+
+#### BSV INFO
 - [Bitcoin SV Website](https://bitcoinsv.io/)
 - [Bitcoin SV Wiki](https://en.wikipedia.org/wiki/Bitcoin_SV)
 - [BSV Developer Documentation](https://docs.bitcoinsv.io/)
@@ -53,10 +55,9 @@ Bitcoin SV (BSV) is a blockchain that aims to maintain the original vision of Bi
 - Styling - Tailwind CSS
 - Analytics - Vercel Analytics
 - Code Formatting/Linting - Biome
-- BrianAPI 
-- LangChain
-- BSV-SDK
-- 
+- AI Agent Tools - BrianAPI 
+- AI Agent Tools - LangChain
+
 
 This uses the new Next.js App Router. This includes support for enhanced layouts, colocation of components, tests, and styles, component-level data fetching, and more.
 
