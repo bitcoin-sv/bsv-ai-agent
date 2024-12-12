@@ -1,31 +1,31 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { AvatarImage, Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { CardContent, Card } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import Link from 'next/link'
-import { SearchResultItem } from '@/lib/types'
+import { useState } from 'react';
+import { AvatarImage, Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { CardContent, Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
+import { SearchResultItem } from '@/lib/types';
 
 export interface SearchResultsProps {
-  results: SearchResultItem[]
+  results: SearchResultItem[];
 }
 
 export function SearchResults({ results }: SearchResultsProps) {
   // State to manage whether to display the results
-  const [showAllResults, setShowAllResults] = useState(false)
+  const [showAllResults, setShowAllResults] = useState(false);
 
   const handleViewMore = () => {
-    setShowAllResults(true)
-  }
+    setShowAllResults(true);
+  };
 
-  const displayedResults = showAllResults ? results : results.slice(0, 3)
-  const additionalResultsCount = results.length > 3 ? results.length - 3 : 0
+  const displayedResults = showAllResults ? results : results.slice(0, 3);
+  const additionalResultsCount = results.length > 3 ? results.length - 3 : 0;
   const displayUrlName = (url: string) => {
-    const hostname = new URL(url).hostname
-    const parts = hostname.split('.')
-    return parts.length > 2 ? parts.slice(1, -1).join('.') : parts[0]
-  }
+    const hostname = new URL(url).hostname;
+    const parts = hostname.split('.');
+    return parts.length > 2 ? parts.slice(1, -1).join('.') : parts[0];
+  };
 
   return (
     <div className="flex flex-wrap">
@@ -74,5 +74,5 @@ export function SearchResults({ results }: SearchResultsProps) {
         </div>
       )}
     </div>
-  )
+  );
 }

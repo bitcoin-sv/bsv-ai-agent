@@ -1,39 +1,39 @@
-'use client'
+'use client';
 
-import { useTransition } from 'react'
-import { useRouter } from 'next/navigation'
+import { useTransition } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
-  SheetTrigger
-} from '@/components/ui/sheet'
-import { Button } from '@/components/ui/button'
-import { ChevronLeft, Menu } from 'lucide-react'
-import { cn } from '@/lib/utils'
-import { History as HistoryIcon } from 'lucide-react'
-import { Suspense } from 'react'
-import { HistorySkeleton } from './history-skeleton'
-import { useAppState } from '@/lib/utils/app-state'
+  SheetTrigger,
+} from '@/components/ui/sheet';
+import { Button } from '@/components/ui/button';
+import { ChevronLeft, Menu } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { History as HistoryIcon } from 'lucide-react';
+import { Suspense } from 'react';
+import { HistorySkeleton } from './history-skeleton';
+import { useAppState } from '@/lib/utils/app-state';
 
 type HistoryProps = {
-  location: 'sidebar' | 'header'
-  children?: React.ReactNode
-}
+  location: 'sidebar' | 'header';
+  children?: React.ReactNode;
+};
 
 export function History({ location, children }: HistoryProps) {
-  const router = useRouter()
-  const [isPending, startTransition] = useTransition()
-  const { isGenerating, setIsGenerating } = useAppState()
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+  const { isGenerating, setIsGenerating } = useAppState();
 
   const onOpenChange = (open: boolean) => {
     if (open) {
       startTransition(() => {
-        router.refresh()
-      })
+        router.refresh();
+      });
     }
-  }
+  };
 
   return (
     <Sheet onOpenChange={onOpenChange}>
@@ -42,7 +42,7 @@ export function History({ location, children }: HistoryProps) {
           variant="ghost"
           size="icon"
           className={cn({
-            'rounded-full text-foreground/30': location === 'sidebar'
+            'rounded-full text-foreground/30': location === 'sidebar',
           })}
           disabled={isGenerating}
         >
@@ -61,5 +61,5 @@ export function History({ location, children }: HistoryProps) {
         </div>
       </SheetContent>
     </Sheet>
-  )
+  );
 }
