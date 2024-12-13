@@ -1,24 +1,24 @@
-'use client'
+'use client';
 
-import { SearchResults } from './search-results'
-import { DefaultSkeleton } from './default-skeleton'
-import { SearchResultsImageSection } from './search-results-image'
-import { Section } from './section'
-import { ToolBadge } from './tool-badge'
-import type { SearchResults as TypeSearchResults } from '@/lib/types'
-import { StreamableValue, useStreamableValue } from 'ai/rsc'
+import { SearchResults } from './search-results';
+import { DefaultSkeleton } from './default-skeleton';
+import { SearchResultsImageSection } from './search-results-image';
+import { Section } from './section';
+import { ToolBadge } from './tool-badge';
+import type { SearchResults as TypeSearchResults } from '@/lib/types';
+import { StreamableValue, useStreamableValue } from 'ai/rsc';
 
 export type SearchSectionProps = {
-  result?: StreamableValue<string>
-  includeDomains?: string[]
-}
+  result?: StreamableValue<string>;
+  includeDomains?: string[];
+};
 
 export function SearchSection({ result, includeDomains }: SearchSectionProps) {
-  const [data, error, pending] = useStreamableValue(result)
-  const searchResults: TypeSearchResults = data ? JSON.parse(data) : undefined
+  const [data, error, pending] = useStreamableValue(result);
+  const searchResults: TypeSearchResults = data ? JSON.parse(data) : undefined;
   const includeDomainsString = includeDomains
     ? ` [${includeDomains.join(', ')}]`
-    : ''
+    : '';
   return (
     <div>
       {!pending && data ? (
@@ -42,5 +42,5 @@ export function SearchSection({ result, includeDomains }: SearchSectionProps) {
         <DefaultSkeleton />
       )}
     </div>
-  )
+  );
 }

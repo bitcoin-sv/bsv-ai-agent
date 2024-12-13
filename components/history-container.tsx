@@ -1,13 +1,13 @@
-import React from 'react'
-import { History } from './history'
-import { HistoryList } from './history-list'
+import React from 'react';
+import { History } from './history';
+import { HistoryList } from './history-list';
 
 type HistoryContainerProps = {
-  location: 'sidebar' | 'header'
-}
+  location: 'sidebar' | 'header';
+};
 
 const HistoryContainer: React.FC<HistoryContainerProps> = async ({
-  location
+  location,
 }) => {
   return (
     <div
@@ -17,7 +17,7 @@ const HistoryContainer: React.FC<HistoryContainerProps> = async ({
         <HistoryList userId="anonymous" />
       </History>
     </div>
-  )
-}
+  );
+};
 
-export default HistoryContainer
+export default HistoryContainer;

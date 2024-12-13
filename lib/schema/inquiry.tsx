@@ -1,5 +1,5 @@
-import { DeepPartial } from 'ai'
-import { z } from 'zod'
+import { DeepPartial } from 'ai';
+import { z } from 'zod';
 
 export const inquirySchema = z.object({
   question: z.string().describe('The inquiry question'),
@@ -7,7 +7,7 @@ export const inquirySchema = z.object({
     .array(
       z.object({
         value: z.string(),
-        label: z.string()
+        label: z.string(),
       })
     )
     .describe('The inquiry options'),
@@ -16,7 +16,7 @@ export const inquirySchema = z.object({
   inputPlaceholder: z
     .string()
     .optional()
-    .describe('The placeholder for the input field')
-})
+    .describe('The placeholder for the input field'),
+});
 
-export type PartialInquiry = DeepPartial<typeof inquirySchema>
+export type PartialInquiry = DeepPartial<typeof inquirySchema>;

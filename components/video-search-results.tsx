@@ -1,73 +1,73 @@
 /* eslint-disable @next/next/no-img-element */
-'use client'
+'use client';
 
-import { useEffect, useRef, useState } from 'react'
-import { AvatarImage, Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { CardContent, Card } from '@/components/ui/card'
+import { useEffect, useRef, useState } from 'react';
+import { AvatarImage, Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { CardContent, Card } from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger
-} from '@/components/ui/dialog'
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import {
   Carousel,
   type CarouselApi,
   CarouselContent,
   CarouselItem,
   CarouselNext,
-  CarouselPrevious
-} from '@/components/ui/carousel'
-import { SerperSearchResultItem, SerperSearchResults } from '@/lib/types'
-import { PlusCircle } from 'lucide-react'
+  CarouselPrevious,
+} from '@/components/ui/carousel';
+import { SerperSearchResultItem, SerperSearchResults } from '@/lib/types';
+import { PlusCircle } from 'lucide-react';
 
 export interface VideoSearchResultsProps {
-  results: SerperSearchResults
+  results: SerperSearchResults;
 }
 
 export function VideoSearchResults({ results }: VideoSearchResultsProps) {
-  const [api, setApi] = useState<CarouselApi>()
-  const [current, setCurrent] = useState(1)
-  const [count, setCount] = useState(0)
-  const [selectedIndex, setSelectedIndex] = useState(0)
-  const videoRefs = useRef<(HTMLIFrameElement | null)[]>([])
+  const [api, setApi] = useState<CarouselApi>();
+  const [current, setCurrent] = useState(1);
+  const [count, setCount] = useState(0);
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const videoRefs = useRef<(HTMLIFrameElement | null)[]>([]);
 
   // filter out the videos that path is not /watch
   const videos = results.videos.filter((video: SerperSearchResultItem) => {
-    return new URL(video.link).pathname === '/watch'
-  })
+    return new URL(video.link).pathname === '/watch';
+  });
 
   // Update the current and count state when the carousel api is available
   useEffect(() => {
     if (api) {
-      setCount(api.scrollSnapList().length)
-      setCurrent(api.selectedScrollSnap() + 1)
+      setCount(api.scrollSnapList().length);
+      setCurrent(api.selectedScrollSnap() + 1);
 
       api.on('select', () => {
-        const newCurrent = api.selectedScrollSnap() + 1
+        const newCurrent = api.selectedScrollSnap() + 1;
         if (newCurrent !== current && videoRefs.current[current - 1]) {
-          const prevVideo = videoRefs.current[current - 1]
+          const prevVideo = videoRefs.current[current - 1];
           prevVideo?.contentWindow?.postMessage(
             '{"event":"command","func":"pauseVideo","args":""}',
             '*'
-          )
+          );
         }
-        setCurrent(newCurrent)
-      })
+        setCurrent(newCurrent);
+      });
     }
-  }, [api, current])
+  }, [api, current]);
 
   // Scroll to the selected index
   useEffect(() => {
     if (api) {
-      api.scrollTo(selectedIndex, true)
+      api.scrollTo(selectedIndex, true);
     }
-  }, [api, selectedIndex])
+  }, [api, selectedIndex]);
 
   if (!results.videos || results.videos.length === 0) {
-    return <div className="text-muted-foreground">No videos found</div>
+    return <div className="text-muted-foreground">No videos found</div>;
   }
 
   return (
@@ -85,7 +85,7 @@ export function VideoSearchResults({ results }: VideoSearchResultsProps) {
                     src={result.imageUrl}
                     alt={result.title}
                     className="w-full aspect-video mb-2"
-                    onError={e =>
+                    onError={(e) =>
                       (e.currentTarget.src = '/images/placeholder-image.png')
                     }
                   />
@@ -129,13 +129,13 @@ export function VideoSearchResults({ results }: VideoSearchResultsProps) {
               >
                 <CarouselContent>
                   {videos.map((video, idx) => {
-                    const videoId = video.link.split('v=')[1]
+                    const videoId = video.link.split('v=')[1];
                     return (
                       <CarouselItem key={idx}>
                         <div className="p-1 flex items-center justify-center h-full">
                           <iframe
-                            ref={el => {
-                              videoRefs.current[idx] = el
+                            ref={(el) => {
+                              videoRefs.current[idx] = el;
                             }}
                             src={`https://www.youtube.com/embed/${videoId}?enablejsapi=1`}
                             className="w-full aspect-video"
@@ -145,7 +145,7 @@ export function VideoSearchResults({ results }: VideoSearchResultsProps) {
                           />
                         </div>
                       </CarouselItem>
-                    )
+                    );
                   })}
                 </CarouselContent>
                 <div className="absolute inset-8 flex items-center justify-between p-4 pointer-events-none">
@@ -167,5 +167,5 @@ export function VideoSearchResults({ results }: VideoSearchResultsProps) {
         </Dialog>
       ))}
     </div>
-  )
+  );
 }

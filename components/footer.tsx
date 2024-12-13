@@ -1,7 +1,7 @@
-import React from 'react'
-import Link from 'next/link'
-import { SiDiscord, SiGithub, SiX } from 'react-icons/si'
-import { Button } from './ui/button'
+import React from 'react';
+import Link from 'next/link';
+import { SiDiscord, SiGithub, SiX } from 'react-icons/si';
+import { Button } from './ui/button';
 
 const Footer: React.FC = () => {
   return (
@@ -36,7 +36,7 @@ const Footer: React.FC = () => {
         </Button>
       </div>
     </footer>
-  )
-}
+  );
+};
 
-export default Footer
+export default Footer;

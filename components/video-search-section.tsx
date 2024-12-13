@@ -1,19 +1,21 @@
-'use client'
+'use client';
 
-import { DefaultSkeleton } from './default-skeleton'
-import { Section } from './section'
-import type { SerperSearchResults } from '@/lib/types'
-import { StreamableValue, useStreamableValue } from 'ai/rsc'
-import { VideoSearchResults } from './video-search-results'
-import { ToolBadge } from './tool-badge'
+import { DefaultSkeleton } from './default-skeleton';
+import { Section } from './section';
+import type { SerperSearchResults } from '@/lib/types';
+import { StreamableValue, useStreamableValue } from 'ai/rsc';
+import { VideoSearchResults } from './video-search-results';
+import { ToolBadge } from './tool-badge';
 
 export type VideoSearchSectionProps = {
-  result?: StreamableValue<string>
-}
+  result?: StreamableValue<string>;
+};
 
 export function VideoSearchSection({ result }: VideoSearchSectionProps) {
-  const [data, error, pending] = useStreamableValue(result)
-  const searchResults: SerperSearchResults = data ? JSON.parse(data) : undefined
+  const [data, error, pending] = useStreamableValue(result);
+  const searchResults: SerperSearchResults = data
+    ? JSON.parse(data)
+    : undefined;
   return (
     <div>
       {!pending && data ? (
@@ -31,5 +33,5 @@ export function VideoSearchSection({ result }: VideoSearchSectionProps) {
         </Section>
       )}
     </div>
-  )
+  );
 }

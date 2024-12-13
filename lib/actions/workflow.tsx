@@ -1,44 +1,44 @@
-'use server'
+'use server';
 
-import React from 'react'
-import { Spinner } from '@/components/ui/spinner'
-import { Section } from '@/components/section'
-import { FollowupPanel } from '@/components/followup-panel'
+import React from 'react';
+import { Spinner } from '@/components/ui/spinner';
+import { Section } from '@/components/section';
+import { FollowupPanel } from '@/components/followup-panel';
 import {
   querySuggestor,
   inquire,
   taskManager,
   researcherWithOllama,
-  researcher
-} from '@/lib/agents'
-import { createStreamableValue, createStreamableUI } from 'ai/rsc'
-import { CoreMessage, generateId } from 'ai'
+  researcher,
+} from '@/lib/agents';
+import { createStreamableValue, createStreamableUI } from 'ai/rsc';
+import { CoreMessage, generateId } from 'ai';
 
 export async function workflow(
   uiState: {
-    uiStream: ReturnType<typeof createStreamableUI>
-    isCollapsed: ReturnType<typeof createStreamableValue>
-    isGenerating: ReturnType<typeof createStreamableValue>
+    uiStream: ReturnType<typeof createStreamableUI>;
+    isCollapsed: ReturnType<typeof createStreamableValue>;
+    isGenerating: ReturnType<typeof createStreamableValue>;
   },
   aiState: any,
   messages: CoreMessage[],
   skip: boolean,
   model: string
 ) {
-  const { uiStream, isCollapsed, isGenerating } = uiState
-  const id = generateId()
+  const { uiStream, isCollapsed, isGenerating } = uiState;
+  const id = generateId();
 
   // Display spinner
-  uiStream.append(<Spinner />)
+  uiStream.append(<Spinner />);
 
-  let action = { object: { next: 'proceed' } }
+  let action = { object: { next: 'proceed' } };
   // If the user does not skip the task, run the task manager
-  if (!skip) action = (await taskManager(messages, model)) ?? action
+  if (!skip) action = (await taskManager(messages, model)) ?? action;
 
   if (action.object.next === 'inquire') {
     // Generate inquiry
-    const inquiry = await inquire(uiStream, messages, model)
-    uiStream.done()
+    const inquiry = await inquire(uiStream, messages, model);
+    uiStream.done();
     aiState.done({
       ...aiState.get(),
       messages: [
@@ -47,27 +47,27 @@ export async function workflow(
           id: generateId(),
           role: 'assistant',
           content: `inquiry: ${inquiry?.question}`,
-          type: 'inquiry'
-        }
-      ]
-    })
+          type: 'inquiry',
+        },
+      ],
+    });
 
-    isCollapsed.done(false)
-    isGenerating.done(false)
-    return
+    isCollapsed.done(false);
+    isGenerating.done(false);
+    return;
   }
 
   // Set the collapsed state to true
-  isCollapsed.done(true)
+  isCollapsed.done(true);
 
   // Remove the spinner
-  uiStream.update(null)
+  uiStream.update(null);
 
-  const useOllama = model.startsWith('ollama')
+  const useOllama = model.startsWith('ollama');
   // Select the appropriate researcher function based on the environment variables
   const { text, toolResults } = useOllama
     ? await researcherWithOllama(uiStream, messages, model)
-    : await researcher(uiStream, messages, model)
+    : await researcher(uiStream, messages, model);
 
   aiState.update({
     ...aiState.get(),
@@ -78,40 +78,40 @@ export async function workflow(
         role: 'tool',
         content: JSON.stringify(toolResult.result),
         name: toolResult.toolName,
-        type: 'tool'
+        type: 'tool',
       })),
       {
         id,
         role: 'assistant',
         content: text,
-        type: 'answer'
-      }
-    ]
-  })
+        type: 'answer',
+      },
+    ],
+  });
 
   const messagesWithAnswer: CoreMessage[] = [
     ...messages,
     {
       role: 'assistant',
-      content: text
-    }
-  ]
+      content: text,
+    },
+  ];
 
   // Generate related queries
   const relatedQueries = await querySuggestor(
     uiStream,
     messagesWithAnswer,
     model
-  )
+  );
   // Add follow-up panel
   uiStream.append(
     <Section title="Follow-up">
       <FollowupPanel />
     </Section>
-  )
+  );
 
-  uiStream.done()
-  isGenerating.done(false)
+  uiStream.done();
+  isGenerating.done(false);
 
   aiState.done({
     ...aiState.get(),
@@ -121,14 +121,14 @@ export async function workflow(
         id,
         role: 'assistant',
         content: JSON.stringify(relatedQueries),
-        type: 'related'
+        type: 'related',
       },
       {
         id,
         role: 'assistant',
         content: 'followup',
-        type: 'followup'
-      }
-    ]
-  })
+        type: 'followup',
+      },
+    ],
+  });
 }

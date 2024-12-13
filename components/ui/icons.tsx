@@ -1,6 +1,6 @@
-'use client'
+'use client';
 
-import { cn } from '@/lib/utils'
+import { cn } from '@/lib/utils';
 
 function IconLogo({ className, ...props }: React.ComponentProps<'svg'>) {
   return (
@@ -16,7 +16,7 @@ function IconLogo({ className, ...props }: React.ComponentProps<'svg'>) {
       <circle cx="102" cy="128" r="18" fill="white"></circle>
       <circle cx="154" cy="128" r="18" fill="white"></circle>
     </svg>
-  )
+  );
 }
 
-export { IconLogo }
+export { IconLogo };
