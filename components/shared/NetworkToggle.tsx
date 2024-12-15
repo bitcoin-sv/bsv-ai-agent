@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Switch } from '@/components/ui/switch';
 import { updateWalletNetwork } from '@/lib/actions/wallet';
 import type { Network } from '@prisma/client';
+import { toast } from 'sonner';
 
 interface NetworkToggleProps {
   userId: string;
@@ -16,18 +17,24 @@ export function NetworkToggle({
   initialNetwork,
   onNetworkChange,
 }: NetworkToggleProps) {
-  const [isMainnet, setIsMainnet] = useState(initialNetwork === 'MAINNET');
+  const [isMainnet, setIsMainnet] = useState(initialNetwork === 'testnet');
   const [isUpdating, setIsUpdating] = useState(false);
 
   async function handleToggle() {
     setIsUpdating(true);
-    const newNetwork = isMainnet ? 'TESTNET' : 'MAINNET';
+    const newNetwork = isMainnet ? 'testnet' : 'mainnet';
     try {
       await updateWalletNetwork(userId, newNetwork);
       setIsMainnet(!isMainnet);
       onNetworkChange(newNetwork);
+
+      toast.success('Success', {
+        description: `Network updated successfully to ${newNetwork}!`,
+      });
     } catch (error) {
-      console.error('Failed to update network:', error);
+      toast.error('Error', {
+        description: 'Failed to update network',
+      });
     } finally {
       setIsUpdating(false);
     }
