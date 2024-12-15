@@ -1,6 +1,6 @@
 'use server';
 
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, type Wallet as PrismaWallet } from '@prisma/client'; // Import the Wallet type
 import {
   generateWallet,
   recreateWalletFromSeedPhrase,
@@ -8,11 +8,29 @@ import {
 
 const prisma = new PrismaClient();
 
+interface Wallet extends PrismaWallet {
+  network: 'testnet' | 'mainnet'; // Ensure the network property is correctly typed
+  transactions: {
+    id: string;
+    amount: number;
+    type: string;
+    status: string;
+    txHash: string;
+    createdAt: Date;
+  }[];
+}
+
 export async function createUserWallet(userId: string) {
   const { walletDetails, secureInfo } = generateWallet('testnet');
 
-  await prisma.wallet.create({
-    data: {
+  await prisma.wallet.upsert({
+    where: { userId },
+    update: {
+      address: walletDetails.address,
+      publicKey: walletDetails.publicKey,
+      network: walletDetails.network,
+    },
+    create: {
       userId,
       address: walletDetails.address,
       publicKey: walletDetails.publicKey,
@@ -68,8 +86,8 @@ export async function recoverUserWallet(
   return secureInfo;
 }
 
-export async function getUserWallet(userId: string) {
-  return prisma.wallet.findUnique({
+export async function getUserWallet(userId: string): Promise<Wallet | null> {
+  const wallet = await prisma.wallet.findUnique({
     where: { userId },
     include: {
       transactions: {
@@ -78,30 +96,14 @@ export async function getUserWallet(userId: string) {
       },
     },
   });
+
+  return wallet as Wallet; // Cast the wallet to the custom type
 }
 
 export async function getUsers() {
   return prisma.user.findFirst();
 }
 
-//For testing
-export async function simulateTransaction(
-  walletId: string,
-  amount: number,
-  type: 'send' | 'receive'
-) {
-  return prisma.transaction.create({
-    data: {
-      walletId,
-      amount,
-      type,
-      status: 'completed',
-      txHash: `sim_${Math.random().toString(36).substring(2, 15)}`,
-    },
-  });
-}
-
-//for testing
 export async function registerUser(email: string, password: string) {
   const user = await prisma.user.create({
     data: {
@@ -110,14 +112,14 @@ export async function registerUser(email: string, password: string) {
     },
   });
 
-  const { walletDetails, secureInfo } = generateWallet('testnet');
+  const { walletDetails, secureInfo } = generateWallet('testnet'); // Use the Network enum
 
   await prisma.wallet.create({
     data: {
       userId: user.id,
       address: walletDetails.address,
       publicKey: walletDetails.publicKey,
-      network: walletDetails.network,
+      network: 'testnet',
     },
   });
 

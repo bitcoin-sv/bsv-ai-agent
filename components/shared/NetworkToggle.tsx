@@ -3,11 +3,12 @@
 import { useState } from 'react';
 import { Switch } from '@/components/ui/switch';
 import { updateWalletNetwork } from '@/lib/actions/wallet';
+import type { Network } from '@prisma/client';
 
 interface NetworkToggleProps {
   userId: string;
-  initialNetwork: 'testnet' | 'mainnet';
-  onNetworkChange: (network: 'testnet' | 'mainnet') => void;
+  initialNetwork: Network;
+  onNetworkChange: (network: Network) => void;
 }
 
 export function NetworkToggle({
@@ -15,12 +16,12 @@ export function NetworkToggle({
   initialNetwork,
   onNetworkChange,
 }: NetworkToggleProps) {
-  const [isMainnet, setIsMainnet] = useState(initialNetwork === 'mainnet');
+  const [isMainnet, setIsMainnet] = useState(initialNetwork === 'MAINNET');
   const [isUpdating, setIsUpdating] = useState(false);
 
   async function handleToggle() {
     setIsUpdating(true);
-    const newNetwork = isMainnet ? 'testnet' : 'mainnet';
+    const newNetwork = isMainnet ? 'TESTNET' : 'MAINNET';
     try {
       await updateWalletNetwork(userId, newNetwork);
       setIsMainnet(!isMainnet);
@@ -38,7 +39,6 @@ export function NetworkToggle({
         checked={isMainnet}
         onCheckedChange={handleToggle}
         disabled={isUpdating}
-        className="data-[state=unchecked]:bg-white data-[state=checked]:bg-white text-red-800 ring-green-400"
       />
       <span className="text-sm font-medium">
         {isMainnet ? 'Mainnet' : 'Testnet'}
