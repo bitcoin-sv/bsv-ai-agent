@@ -33,6 +33,7 @@ export default function WalletPage() {
   const [recoveredWallet, setRecoveredWallet] = useState<Wallet | null>(null);
   const [seedPhrase, setSeedPhrase] = useState<string>('');
   const [recoveryInput, setRecoveryInput] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
   const [recoveryMethod, setRecoveryMethod] = useState<'wif' | 'seed' | null>(
     null
   );
@@ -56,6 +57,7 @@ export default function WalletPage() {
 
   const generateNewWallet = async () => {
     try {
+      setLoading(true);
       //This will be replaced when the issue #2 is completed
       const userId = '7c3bb2a7-6759-415b-a3b8-9fea642c9c20';
 
@@ -63,6 +65,7 @@ export default function WalletPage() {
 
       const wallet = await getUserWallet(userId);
       if (!wallet) {
+        setLoading(false);
         return toast.error('Error', {
           description: 'An error occured, please try again',
         });
@@ -78,18 +81,21 @@ export default function WalletPage() {
       setSeedPhrase(secureInfo.seedPhrase);
       setRecoveredWallet(null);
       setError('');
+      setLoading(false);
     } catch (err) {
       const errorMessage = `Wallet generation failed: ${err instanceof Error ? err.message : String(err)}`;
       setError(errorMessage);
       toast.error('Wallet Generation Error', {
         description: errorMessage,
       });
+      setLoading(false);
     }
   };
 
   const recoverWallet = async () => {
     setError('');
     try {
+      setLoading(true);
       if (!recoveryMethod || !recoveryInput) {
         throw new Error(
           'Please choose a recovery method and enter a seed phrase'
@@ -109,6 +115,7 @@ export default function WalletPage() {
       const wallet = await getUserWallet(userId);
 
       if (!wallet) {
+        setLoading(false);
         return toast.error('Error', {
           description: 'An error occured, please try again',
         });
@@ -121,12 +128,14 @@ export default function WalletPage() {
         publicKey: wallet.publicKey,
       });
       setError('');
+      setLoading(false);
     } catch (err) {
       const errorMessage = `Recovery failed: ${err instanceof Error ? err.message : String(err)}`;
       setError(errorMessage);
       toast.error('Wallet Recovery Error', {
         description: errorMessage,
       });
+      setLoading(false);
     }
   };
 
@@ -156,7 +165,11 @@ export default function WalletPage() {
             onClick={generateNewWallet}
             className="w-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-800 dark:hover:bg-blue-700 text-white transition-colors"
           >
-            <RefreshCw className="mr-2 h-4 w-4" /> Generate New Wallet
+            <RefreshCw
+              className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : 'animate-none'}`}
+            />{' '}
+            {loading ? 'Generating' : 'Generate New'}
+            Wallet
           </Button>
 
           {walletDetails && (
@@ -203,7 +216,10 @@ export default function WalletPage() {
             className="w-full bg-green-600 hover:bg-green-700 dark:bg-green-800 dark:hover:bg-green-700 text-white transition-colors"
             disabled={!recoveryMethod || !recoveryInput}
           >
-            Recover Wallet
+            <RefreshCw
+              className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : 'animate-none'}`}
+            />{' '}
+            {loading ? 'Rocovering' : 'Reocver'} Wallet
           </Button>
 
           {error && (
