@@ -3,7 +3,7 @@
 
 'use client';
 
-import { FC, memo } from 'react';
+import { type FC, memo } from 'react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { coldarkDark } from 'react-syntax-highlighter/dist/cjs/styles/prism';
 
@@ -57,7 +57,7 @@ const CodeBlock: FC<Props> = memo(({ language, value }) => {
     }
     const fileExtension = programmingLanguages[language] || '.file';
     const suggestedFileName = `file-${generateId()}${fileExtension}`;
-    const fileName = window.prompt('Enter file name' || '', suggestedFileName);
+    const fileName = window.prompt('Enter file name', suggestedFileName || '');
 
     if (!fileName) {
       // User pressed cancel on prompt.
