@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import type { AI, UIState } from '@/app/actions';
 import { useUIState, useActions, useAIState } from 'ai/rsc';
@@ -17,7 +17,7 @@ import { models } from '@/lib/types/models';
 import { useLocalStorage } from '@/lib/hooks/use-local-storage';
 import { getDefaultModelId } from '@/lib/utils';
 import { toast } from 'sonner';
-
+import BsvButton from './bsv/BsvButton';
 interface ChatPanelProps {
   messages: UIState;
   query?: string;
@@ -53,34 +53,37 @@ export function ChatPanel({ messages, query, onModelChange }: ChatPanelProps) {
     }, 300);
   };
 
-  async function handleQuerySubmit(query: string, formData?: FormData) {
-    setInput(query);
-    setIsGenerating(true);
+  const handleQuerySubmit = useCallback(
+    async (query: string, formData?: FormData) => {
+      setInput(query);
+      setIsGenerating(true);
 
-    // Add user message to UI state
-    setMessages((currentMessages) => [
-      ...currentMessages,
-      {
-        id: generateId(),
-        component: <UserMessage message={query} />,
-      },
-    ]);
+      // Add user message to UI state
+      setMessages((currentMessages) => [
+        ...currentMessages,
+        {
+          id: generateId(),
+          component: <UserMessage message={query} />,
+        },
+      ]);
 
-    // Use existing formData or create new one
-    const data = formData || new FormData();
+      // Use existing formData or create new one
+      const data = formData || new FormData();
 
-    // Add or update the model information
-    const modelString = selectedModelId;
-    data.set('model', modelString);
+      // Add or update the model information
+      const modelString = selectedModelId;
+      data.set('model', modelString);
 
-    // Add or update the input query if not already present
-    if (!formData) {
-      data.set('input', query);
-    }
+      // Add or update the input query if not already present
+      if (!formData) {
+        data.set('input', query);
+      }
 
-    const responseMessage = await submit(data);
-    setMessages((currentMessages) => [...currentMessages, responseMessage]);
-  }
+      const responseMessage = await submit(data);
+      setMessages((currentMessages) => [...currentMessages, responseMessage]);
+    },
+    [selectedModelId, setIsGenerating, setMessages, submit]
+  );
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -101,8 +104,7 @@ export function ChatPanel({ messages, query, onModelChange }: ChatPanelProps) {
       handleQuerySubmit(query);
       isFirstRender.current = false;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query]);
+  }, [handleQuerySubmit, query]);
 
   useEffect(() => {
     const lastMessage = aiMessage.messages.slice(-1)[0];
@@ -212,8 +214,10 @@ export function ChatPanel({ messages, query, onModelChange }: ChatPanelProps) {
               // Decrease the border radius by 4px for each 20px height increase
               const newBorder = initialBorder - 4 * multiple;
               // The lowest border radius will be 8px
-              inputRef.current.style.borderRadius =
-                Math.max(8, newBorder) + 'px';
+              inputRef.current.style.borderRadius = `${Math.max(
+                8,
+                newBorder
+              )}px`;
             }}
             onFocus={() => setShowEmptyScreen(true)}
             onBlur={() => setShowEmptyScreen(false)}
@@ -235,6 +239,7 @@ export function ChatPanel({ messages, query, onModelChange }: ChatPanelProps) {
           className={cn(showEmptyScreen ? 'visible' : 'invisible')}
         />
       </form>
+      <BsvButton />
     </div>
   );
 }

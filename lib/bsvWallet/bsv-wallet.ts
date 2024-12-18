@@ -14,7 +14,7 @@ export interface SecureWalletInfo {
 }
 
 // Generate a wallet using the specified network (default is TESTNET)
-export function generateWallet(network: Network = Network.TESTNET): {
+export function generateWallet(network: Network = Network.testnet): {
   walletDetails: WalletDetails;
   secureInfo: SecureWalletInfo;
 } {
@@ -22,7 +22,7 @@ export function generateWallet(network: Network = Network.TESTNET): {
   const privateKey = generatePrivateKey(seedPhrase);
   const publicKey = privateKey.toPublicKey();
   const address = publicKey
-    .toAddress(network === Network.TESTNET ? [0x6f] : [0x00]) // Use the Network enum
+    .toAddress(network === Network.testnet ? [0x6f] : [0x00]) // Use the Network enum
     .toString();
 
   return {
@@ -54,7 +54,7 @@ function generatePrivateKey(seedPhrase: string): PrivateKey {
 // Recreate a wallet from a seed phrase and network type (default is TESTNET)
 export function recreateWalletFromSeedPhrase(
   seedPhrase: string,
-  network: Network = Network.TESTNET // Default to TESTNET using the Network enum
+  network: Network = Network.testnet // Default to TESTNET using the Network enum
 ): {
   walletDetails: WalletDetails;
   secureInfo: SecureWalletInfo;
@@ -66,7 +66,7 @@ export function recreateWalletFromSeedPhrase(
   const privateKey = generatePrivateKey(seedPhrase);
   const publicKey = privateKey.toPublicKey();
   const address = publicKey
-    .toAddress(network === Network.TESTNET ? [0x6f] : [0x00]) // Use the Network enum
+    .toAddress(network === Network.testnet ? [0x6f] : [0x00]) // Use the Network enum
     .toString();
 
   return {
