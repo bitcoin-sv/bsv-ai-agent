@@ -19,7 +19,7 @@ export function Chat({ id, query }: ChatProps) {
     if (!path.includes('search') && messages.length === 1) {
       window.history.replaceState({}, '', `/search/${id}`);
     }
-  }, [id, path, messages, query]);
+  }, [id, path, messages]);
 
   return (
     <div className="px-8 sm:px-12 pt-12 md:pt-14 pb-14 md:pb-24 max-w-3xl mx-auto flex flex-col space-y-3 md:space-y-4">
