@@ -1,127 +1,226 @@
 'use server';
 
-import { PrismaClient, type Wallet as PrismaWallet } from '@prisma/client'; // Import the Wallet type
 import {
-  generateWallet,
-  recreateWalletFromSeedPhrase,
-} from '../bsvWallet/bsv-wallet';
+  PrismaClient,
+  type Wallet as PrismaWallet,
+  Network,
+} from '@prisma/client';
+// import { hash } from 'crypto'
+import {
+  generateRandomKeyPair,
+  fromSeedPhrase,
+} from '../bsvWallet/key-management';
+// import { hash } from 'bcrypt'
 
 const prisma = new PrismaClient();
 
-interface Wallet extends PrismaWallet {
-  network: 'testnet' | 'mainnet'; // Ensure the network property is correctly typed
-  transactions: {
-    id: string;
-    amount: number;
-    type: string;
-    status: string;
-    txHash: string;
-    createdAt: Date;
-  }[];
+interface Transaction {
+  id: string;
+  amount: number;
+  type: string;
+  status: string;
+  txHash: string;
+  createdAt: Date;
 }
 
-export async function createUserWallet(userId: string) {
-  const { walletDetails, secureInfo } = generateWallet('testnet');
+interface Wallet extends PrismaWallet {
+  network: 'testnet' | 'mainnet';
+  transactions: Transaction[];
+}
 
-  await prisma.wallet.upsert({
-    where: { userId },
-    update: {
-      address: walletDetails.address,
-      publicKey: walletDetails.publicKey,
-      network: walletDetails.network,
-    },
-    create: {
-      userId,
-      address: walletDetails.address,
-      publicKey: walletDetails.publicKey,
-      network: walletDetails.network,
-    },
-  });
+interface WalletResponse {
+  seedPhrase: string;
+  privateKeyWif: string;
+}
 
-  return secureInfo;
+interface SecureWalletInfo {
+  seedPhrase: string;
+  privateKeyWif: string;
+}
+
+export async function createUserWallet(
+  userId: string
+): Promise<WalletResponse> {
+  try {
+    const keyPair = generateRandomKeyPair();
+
+    if (!keyPair.seedPhrase) {
+      throw new Error('Failed to generate seed phrase');
+    }
+
+    await prisma.wallet.upsert({
+      where: { userId },
+      update: {
+        address: keyPair.publicKey.address,
+        publicKey: keyPair.publicKey.hex,
+        network: Network.testnet,
+      },
+      create: {
+        userId,
+        address: keyPair.publicKey.address,
+        publicKey: keyPair.publicKey.hex,
+        network: Network.testnet,
+      },
+    });
+
+    return {
+      seedPhrase: keyPair.seedPhrase,
+      privateKeyWif: keyPair.privateKey.wif,
+    };
+  } catch (error) {
+    console.error('Error creating wallet:', error);
+    throw new Error(
+      `Failed to create wallet: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
+  }
 }
 
 export async function updateWalletNetwork(
   userId: string,
   network: 'testnet' | 'mainnet'
-) {
-  const { walletDetails } = generateWallet(network);
+): Promise<{ address: string; network: Network }> {
+  try {
+    const wallet = await prisma.wallet.findUnique({
+      where: { userId },
+    });
 
-  await prisma.wallet.update({
-    where: { userId },
-    data: {
-      network,
-      address: walletDetails.address,
-    },
-  });
+    if (!wallet) {
+      throw new Error('Wallet not found');
+    }
 
-  return walletDetails;
+    const updatedWallet = await prisma.wallet.update({
+      where: { userId },
+      data: {
+        network: network === 'testnet' ? Network.testnet : Network.mainnet,
+      },
+    });
+
+    return {
+      address: updatedWallet.address,
+      network: updatedWallet.network,
+    };
+  } catch (error) {
+    console.error('Error updating wallet network:', error);
+    throw new Error(
+      `Failed to update wallet network: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
+  }
 }
 
 export async function recoverUserWallet(
   userId: string,
   seedPhrase: string,
   network: 'testnet' | 'mainnet' = 'testnet'
-) {
-  const { walletDetails, secureInfo } = recreateWalletFromSeedPhrase(
-    seedPhrase,
-    network
-  );
+): Promise<WalletResponse> {
+  try {
+    const keyPair = fromSeedPhrase(seedPhrase);
 
-  await prisma.wallet.upsert({
-    where: { userId },
-    update: {
-      address: walletDetails.address,
-      publicKey: walletDetails.publicKey,
-      network: walletDetails.network,
-    },
-    create: {
-      userId,
-      address: walletDetails.address,
-      publicKey: walletDetails.publicKey,
-      network: walletDetails.network,
-    },
-  });
+    if (!keyPair.seedPhrase) {
+      throw new Error('Failed to recover seed phrase');
+    }
 
-  return secureInfo;
+    await prisma.wallet.upsert({
+      where: { userId },
+      update: {
+        address: keyPair.publicKey.address,
+        publicKey: keyPair.publicKey.hex,
+        network: network === 'testnet' ? Network.testnet : Network.mainnet,
+      },
+      create: {
+        userId,
+        address: keyPair.publicKey.address,
+        publicKey: keyPair.publicKey.hex,
+        network: network === 'testnet' ? Network.testnet : Network.mainnet,
+      },
+    });
+
+    return {
+      seedPhrase: keyPair.seedPhrase,
+      privateKeyWif: keyPair.privateKey.wif,
+    };
+  } catch (error) {
+    console.error('Error recovering wallet:', error);
+    throw new Error(
+      `Failed to recover wallet: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
+  }
 }
 
 export async function getUserWallet(userId: string): Promise<Wallet | null> {
-  const wallet = await prisma.wallet.findUnique({
-    where: { userId },
-    include: {
-      transactions: {
-        orderBy: { createdAt: 'desc' },
-        take: 10,
+  try {
+    const wallet = await prisma.wallet.findUnique({
+      where: { userId },
+      include: {
+        transactions: {
+          orderBy: { createdAt: 'desc' },
+          take: 10,
+        },
       },
-    },
-  });
+    });
 
-  return wallet as Wallet; // Cast the wallet to the custom type
+    if (!wallet) return null;
+
+    return {
+      ...wallet,
+      network: wallet.network.toLowerCase() as 'testnet' | 'mainnet',
+    };
+  } catch (error) {
+    console.error('Error fetching wallet:', error);
+    throw new Error(
+      `Failed to fetch wallet: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
+  }
 }
 
 export async function getUsers() {
-  return prisma.user.findFirst();
+  try {
+    return await prisma.user.findFirst();
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    throw new Error(
+      `Failed to fetch users: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
+  }
 }
 
-export async function registerUser(email: string, password: string) {
-  const user = await prisma.user.create({
-    data: {
-      email,
-      password: password,
-    },
-  });
+export async function registerUser(
+  email: string,
+  password: string
+): Promise<{ userId: string } & SecureWalletInfo> {
+  try {
+    // const hashedPassword = await hash(password, 10)
 
-  const { walletDetails, secureInfo } = generateWallet('testnet'); // Use the Network enum
+    const user = await prisma.user.create({
+      data: {
+        email,
+        password: 'hashedPassword',
+      },
+    });
 
-  await prisma.wallet.create({
-    data: {
+    const keyPair = generateRandomKeyPair();
+
+    if (!keyPair.seedPhrase) {
+      throw new Error('Failed to generate seed phrase');
+    }
+
+    await prisma.wallet.create({
+      data: {
+        userId: user.id,
+        address: keyPair.publicKey.address,
+        publicKey: keyPair.publicKey.hex,
+        network: Network.testnet,
+      },
+    });
+
+    return {
       userId: user.id,
-      address: walletDetails.address,
-      publicKey: walletDetails.publicKey,
-      network: 'testnet',
-    },
-  });
-
-  return { userId: user.id, ...secureInfo };
+      seedPhrase: keyPair.seedPhrase,
+      privateKeyWif: keyPair.privateKey.wif,
+    };
+  } catch (error) {
+    console.error('Error registering user:', error);
+    throw new Error(
+      `Failed to register user: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
+  }
 }
