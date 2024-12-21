@@ -7,12 +7,7 @@
     "dev": "next dev --turbo",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "format": "biome format --write .",
-    "biome-lint": "biome lint .",
-    "check": "biome check .",
-    "prepare": "husky",
-    "lint-staged": "lint-staged"
+    "lint": "next lint"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^1.0.2",
