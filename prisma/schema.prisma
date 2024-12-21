@@ -1,21 +1,36 @@
 generator client {
   provider = "prisma-client-js"
+  output   = "./generated/client"
 }
 
 datasource db {
   provider = "postgresql"
-  url = env("POSTGRES_PRISMA_URL")
+  url      = env("POSTGRES_PRISMA_URL")
+}
+
+enum Role {
+  user
+  admin
+}
+
+enum Theme {
+  light
+  dark
+  system
 }
 
 model User {
   id        String   @id @default(uuid())
+  userId    String   @unique
   email     String   @unique
+  role      Role
   password  String
+  theme     Theme    @default(system)
+  imageUrl  String   @default("/images/placeholder-user.jpg")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   wallet    Wallet?
 }
-
 
 enum Network {
   testnet
@@ -28,7 +43,7 @@ model Wallet {
   user         User          @relation(fields: [userId], references: [id])
   address      String
   publicKey    String
-  network      Network       // Change this line to use the enum
+  network      Network // Change this line to use the enum
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
   transactions Transaction[]
@@ -44,4 +59,3 @@ model Transaction {
   txHash    String
   createdAt DateTime @default(now())
 }
-
