@@ -15,12 +15,12 @@ const fontSans = FontSans({
   variable: '--font-sans',
 });
 
-const title = 'Morphic';
+const title = 'BSV AI Agent';
 const description =
-  'A fully open-source AI-powered answer engine with a generative UI.';
+  'The BSV AI Agent abstracts the complexity of blockchain transactions and empowers users to perform a wide array of on-chain activities using simple, intuitive prompts.';
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://morphic.sh'),
+  metadataBase: new URL('bsv-ai.vercel.app'),
   title,
   description,
   openGraph: {
