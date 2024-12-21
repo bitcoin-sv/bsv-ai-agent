@@ -1,7 +1,0 @@
-{
-  "*.{ts,tsx,js,jsx}": [
-    "biome format --write",
-    "biome lint --write",
-    "eslint --fix"
-  ]
-}

@@ -7,7 +7,7 @@
     "dev": "next dev --turbo",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint .",
+    "lint": "next lint",
     "format": "biome format --write .",
     "biome-lint": "biome lint .",
     "check": "biome check .",
