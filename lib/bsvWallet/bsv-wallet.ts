@@ -1,5 +1,5 @@
 import { PrivateKey } from '@bsv/sdk';
-import { Network } from '@prisma/client';
+import { Network } from '@/prisma/generated/client';
 import * as bip39 from 'bip39';
 
 export interface WalletDetails {

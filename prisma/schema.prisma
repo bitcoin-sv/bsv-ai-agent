@@ -8,10 +8,25 @@ datasource db {
   url      = env("POSTGRES_PRISMA_URL")
 }
 
+enum Role {
+  user
+  admin
+}
+
+enum Theme {
+  light
+  dark
+  system
+}
+
 model User {
   id        String   @id @default(uuid())
+  userId    String   @unique
   email     String   @unique
+  role      Role
   password  String
+  theme     Theme    @default(system)
+  imageUrl  String   @default("/images/placeholder-user.jpg")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   wallet    Wallet?

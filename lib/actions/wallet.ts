@@ -4,7 +4,7 @@ import {
   PrismaClient,
   type Wallet as PrismaWallet,
   Network,
-} from '@prisma/client';
+} from '@/prisma/generated/client';
 // import { hash } from 'crypto'
 import {
   generateRandomKeyPair,
@@ -70,7 +70,9 @@ export async function createUserWallet(
   } catch (error) {
     console.error('Error creating wallet:', error);
     throw new Error(
-      `Failed to create wallet: ${error instanceof Error ? error.message : 'Unknown error'}`
+      `Failed to create wallet: ${
+        error instanceof Error ? error.message : 'Unknown error'
+      }`
     );
   }
 }
@@ -102,7 +104,9 @@ export async function updateWalletNetwork(
   } catch (error) {
     console.error('Error updating wallet network:', error);
     throw new Error(
-      `Failed to update wallet network: ${error instanceof Error ? error.message : 'Unknown error'}`
+      `Failed to update wallet network: ${
+        error instanceof Error ? error.message : 'Unknown error'
+      }`
     );
   }
 }
@@ -141,7 +145,9 @@ export async function recoverUserWallet(
   } catch (error) {
     console.error('Error recovering wallet:', error);
     throw new Error(
-      `Failed to recover wallet: ${error instanceof Error ? error.message : 'Unknown error'}`
+      `Failed to recover wallet: ${
+        error instanceof Error ? error.message : 'Unknown error'
+      }`
     );
   }
 }
@@ -167,7 +173,9 @@ export async function getUserWallet(userId: string): Promise<Wallet | null> {
   } catch (error) {
     console.error('Error fetching wallet:', error);
     throw new Error(
-      `Failed to fetch wallet: ${error instanceof Error ? error.message : 'Unknown error'}`
+      `Failed to fetch wallet: ${
+        error instanceof Error ? error.message : 'Unknown error'
+      }`
     );
   }
 }
@@ -178,7 +186,9 @@ export async function getUsers() {
   } catch (error) {
     console.error('Error fetching users:', error);
     throw new Error(
-      `Failed to fetch users: ${error instanceof Error ? error.message : 'Unknown error'}`
+      `Failed to fetch users: ${
+        error instanceof Error ? error.message : 'Unknown error'
+      }`
     );
   }
 }
@@ -220,7 +230,9 @@ export async function registerUser(
   } catch (error) {
     console.error('Error registering user:', error);
     throw new Error(
-      `Failed to register user: ${error instanceof Error ? error.message : 'Unknown error'}`
+      `Failed to register user: ${
+        error instanceof Error ? error.message : 'Unknown error'
+      }`
     );
   }
 }
