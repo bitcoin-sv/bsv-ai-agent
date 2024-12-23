@@ -9,11 +9,17 @@
     "start": "next start",
     "lint": "next lint"
   },
+  "prettier": {
+    "singleQuote": true,
+    "trailingCommas": "es5",
+    "semi": true
+  },
   "dependencies": {
     "@ai-sdk/anthropic": "^1.0.2",
     "@ai-sdk/azure": "^1.0.5",
     "@ai-sdk/google": "^1.0.3",
     "@ai-sdk/openai": "^1.0.4",
+    "@brian-ai/sdk": "^0.3.6",
     "@bsv/sdk": "^1.2.12",
     "@prisma/client": "^6.0.1",
     "@radix-ui/react-alert-dialog": "^1.0.5",

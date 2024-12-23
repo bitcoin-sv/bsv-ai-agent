@@ -32,6 +32,8 @@ export function getModel(model: string) {
 
 export function isProviderEnabled(providerId: string): boolean {
   switch (providerId) {
+    case 'brian':
+      return !!process.env.BRIAN_API_KEY;
     case 'openai':
       return !!process.env.OPENAI_API_KEY;
     case 'anthropic':

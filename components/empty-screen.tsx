@@ -3,6 +3,10 @@ import { ArrowRight } from 'lucide-react';
 
 const exampleMessages = [
   {
+    heading: 'Can you swap 10 usdc for eth on Ethereum?',
+    message: 'Can you swap 10 usdc for eth on Ethereum?',
+  },
+  /* {
     heading: 'What is OpenAI o1?',
     message: 'What is OpenAI o1?',
   },
@@ -17,7 +21,7 @@ const exampleMessages = [
   {
     heading: 'Summary: https://arxiv.org/pdf/2407.16833',
     message: 'Summary: https://arxiv.org/pdf/2407.16833',
-  },
+  }, */
 ];
 export function EmptyScreen({
   submitMessage,
