@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Switch } from '@/components/ui/switch';
 import { updateWalletNetwork } from '@/lib/actions/wallet';
-import type { Network } from '@prisma/client';
+import type { Network } from '@/prisma/generated/client';
 import { toast } from 'sonner';
 
 interface NetworkToggleProps {

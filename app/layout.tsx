@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { Inter as FontSans } from 'next/font/google';
+import { ClerkProvider } from '@clerk/nextjs';
 import './globals.css';
 import { cn } from '@/lib/utils';
 import { ThemeProvider } from '@/components/theme-provider';
@@ -47,23 +48,25 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={cn('font-sans antialiased', fontSans.variable)}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <AppStateProvider>
-            <Header />
-            {children}
-            <Sidebar />
-            <Footer />
-            <Toaster />
-          </AppStateProvider>
-        </ThemeProvider>
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en" suppressHydrationWarning>
+        <body className={cn('font-sans antialiased', fontSans.variable)}>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <AppStateProvider>
+              <Header />
+              {children}
+              <Sidebar />
+              <Footer />
+              <Toaster />
+            </AppStateProvider>
+          </ThemeProvider>
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }
