@@ -3,11 +3,23 @@ import { CoreMessage, generateText, streamText } from 'ai';
 import { getTools } from './tools';
 import { getModel } from '../utils/registry';
 import { AnswerSection } from '@/components/answer-section';
+import { brianTransact } from '@/lib/brian';
 
 const SYSTEM_PROMPT = `As a professional search expert, you possess the ability to search for any information on the web.
 For each user query, utilize the search results to their fullest potential to provide additional information and assistance in your response.
 If there are any images relevant to your answer, be sure to include them as well.
 Aim to directly address the user's question, augmenting your response with insights gleaned from the search results.`;
+
+const getPrompt = (messages: CoreMessage[]) => {
+  const lastUserMessage = messages.findLast(({ role }) => role === 'user');
+  if (!lastUserMessage) {
+    return '';
+  }
+  const { input } = JSON.parse(lastUserMessage.content as string) as {
+    input: string;
+  };
+  return input;
+};
 
 export async function researcher(
   uiStream: ReturnType<typeof createStreamableUI>,
@@ -17,7 +29,7 @@ export async function researcher(
   try {
     let fullResponse = '';
     const streamableText = createStreamableValue<string>();
-    let toolResults: any[] = [];
+    /* let toolResults: any[] = [];
 
     const currentDate = new Date().toLocaleString();
     const result = await streamText({
@@ -49,6 +61,14 @@ export async function researcher(
     }
 
     streamableText.done(fullResponse);
+
+    return { text: fullResponse, toolResults }; */
+    // const result = await askBrian('What is the capital of France?');
+    const prompt = getPrompt(messages);
+    const { text, toolResults } = await brianTransact(prompt);
+    fullResponse += text;
+    streamableText.done(fullResponse);
+    uiStream.append(<AnswerSection result={streamableText.value} />);
 
     return { text: fullResponse, toolResults };
   } catch (error) {

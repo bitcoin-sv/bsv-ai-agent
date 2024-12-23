@@ -6,7 +6,8 @@ export interface Model {
 }
 
 export const models: Model[] = [
-  {
+  { id: 'brian', name: 'Brian', provider: 'Brian', providerId: 'brian' },
+  /* {
     id: 'gpt-4o',
     name: 'GPT-4o',
     provider: 'OpenAI',
@@ -59,5 +60,5 @@ export const models: Model[] = [
     name: process.env.NEXT_PUBLIC_OPENAI_COMPATIBLE_MODEL || 'Undefined',
     provider: 'OpenAI Compatible',
     providerId: 'openai-compatible',
-  },
+  }, */
 ];

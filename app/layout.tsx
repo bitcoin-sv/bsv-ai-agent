@@ -20,7 +20,7 @@ const description =
   'The BSV AI Agent abstracts the complexity of blockchain transactions and empowers users to perform a wide array of on-chain activities using simple, intuitive prompts.';
 
 export const metadata: Metadata = {
-  metadataBase: new URL('bsv-ai.vercel.app'),
+  metadataBase: new URL('https://bsv-ai.vercel.app/'),
   title,
   description,
   openGraph: {

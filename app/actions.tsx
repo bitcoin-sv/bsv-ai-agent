@@ -61,15 +61,15 @@ async function submit(
   const content = skip
     ? userInput
     : formData
-      ? JSON.stringify(Object.fromEntries(formData))
-      : null;
+    ? JSON.stringify(Object.fromEntries(formData))
+    : null;
   const type = skip
     ? undefined
     : formData?.has('input')
-      ? 'input'
-      : formData?.has('related_query')
-        ? 'input_related'
-        : 'inquiry';
+    ? 'input'
+    : formData?.has('related_query')
+    ? 'input_related'
+    : 'inquiry';
 
   // Get the model from the form data (e.g., openai:gpt-4o-mini)
   const model = (formData?.get('model') as string) || 'openai:gpt-4o-mini';

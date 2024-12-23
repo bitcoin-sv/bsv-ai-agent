@@ -33,7 +33,7 @@ export async function workflow(
 
   let action = { object: { next: 'proceed' } };
   // If the user does not skip the task, run the task manager
-  if (!skip) action = (await taskManager(messages, model)) ?? action;
+  // if (!skip) action = (await taskManager(messages, model)) ?? action;
 
   if (action.object.next === 'inquire') {
     // Generate inquiry
@@ -98,11 +98,11 @@ export async function workflow(
   ];
 
   // Generate related queries
-  const relatedQueries = await querySuggestor(
+  /* const relatedQueries = await querySuggestor(
     uiStream,
     messagesWithAnswer,
     model
-  );
+  ); */
   // Add follow-up panel
   uiStream.append(
     <Section title="Follow-up">
@@ -117,12 +117,12 @@ export async function workflow(
     ...aiState.get(),
     messages: [
       ...aiState.get().messages,
-      {
+      /* {
         id,
         role: 'assistant',
         content: JSON.stringify(relatedQueries),
         type: 'related',
-      },
+      }, */
       {
         id,
         role: 'assistant',
