@@ -33,7 +33,7 @@ export async function workflow(
 
   let action = { object: { next: 'proceed' } };
   // If the user does not skip the task, run the task manager
-  if (!skip) action = (await taskManager(messages, model)) ?? action;
+  // if (!skip) action = (await taskManager(messages, model)) ?? action;
 
   if (action.object.next === 'inquire') {
     // Generate inquiry

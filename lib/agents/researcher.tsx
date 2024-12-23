@@ -65,7 +65,6 @@ export async function researcher(
     return { text: fullResponse, toolResults }; */
     // const result = await askBrian('What is the capital of France?');
     const prompt = getPrompt(messages);
-    console.log(prompt);
     const { text, toolResults } = await brianTransact(prompt);
     fullResponse += text;
     streamableText.done(fullResponse);
