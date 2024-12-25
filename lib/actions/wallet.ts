@@ -5,12 +5,10 @@ import {
   type Wallet as PrismaWallet,
   Network,
 } from '@/prisma/generated/client';
-// import { hash } from 'crypto'
 import {
   generateRandomKeyPair,
   fromSeedPhrase,
 } from '../bsvWallet/key-management';
-// import { hash } from 'bcrypt'
 
 const prisma = new PrismaClient();
 
@@ -187,50 +185,6 @@ export async function getUsers() {
     console.error('Error fetching users:', error);
     throw new Error(
       `Failed to fetch users: ${
-        error instanceof Error ? error.message : 'Unknown error'
-      }`
-    );
-  }
-}
-
-export async function registerUser(
-  email: string,
-  password: string
-): Promise<{ userId: string } & SecureWalletInfo> {
-  try {
-    // const hashedPassword = await hash(password, 10)
-
-    const user = await prisma.user.create({
-      data: {
-        email,
-        password: 'hashedPassword',
-      },
-    });
-
-    const keyPair = generateRandomKeyPair();
-
-    if (!keyPair.seedPhrase) {
-      throw new Error('Failed to generate seed phrase');
-    }
-
-    await prisma.wallet.create({
-      data: {
-        userId: user.id,
-        address: keyPair.publicKey.address,
-        publicKey: keyPair.publicKey.hex,
-        network: Network.testnet,
-      },
-    });
-
-    return {
-      userId: user.id,
-      seedPhrase: keyPair.seedPhrase,
-      privateKeyWif: keyPair.privateKey.wif,
-    };
-  } catch (error) {
-    console.error('Error registering user:', error);
-    throw new Error(
-      `Failed to register user: ${
         error instanceof Error ? error.message : 'Unknown error'
       }`
     );
