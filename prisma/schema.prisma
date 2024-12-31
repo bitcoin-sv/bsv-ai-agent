@@ -40,7 +40,7 @@ enum Network {
 model Wallet {
   id           String        @id @default(uuid())
   userId       String        @unique
-  user         User          @relation(fields: [userId], references: [id])
+  user         User          @relation(fields: [userId], references: [userId])
   address      String
   publicKey    String
   network      Network // Change this line to use the enum
