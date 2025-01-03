@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import { ModeToggle } from './mode-toggle';
 import { IconLogo } from './ui/icons';
 import { cn } from '@/lib/utils';
@@ -14,6 +15,12 @@ export const Header: React.FC = async () => {
         </a>
       </div>
       <div className="flex gap-0.5">
+        <Link
+          className="px-3 py-2 hover:bg-accent hover:text-accent-foreground rounded-md transition-colors"
+          href="/settings"
+        >
+          Settings
+        </Link>
         <ModeToggle />
         <HistoryContainer location="header" />
       </div>
