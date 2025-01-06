@@ -9,6 +9,7 @@ import Footer from '@/components/footer';
 import { Sidebar } from '@/components/sidebar';
 import { Toaster } from '@/components/ui/sonner';
 import { AppStateProvider } from '@/lib/utils/app-state';
+import { fetchUser } from '@/lib/prisma';
 
 const fontSans = FontSans({
   subsets: ['latin'],
@@ -42,18 +43,19 @@ export const viewport: Viewport = {
   maximumScale: 1,
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const user = await fetchUser();
   return (
     <ClerkProvider>
       <html lang="en" suppressHydrationWarning>
         <body className={cn('font-sans antialiased', fontSans.variable)}>
           <ThemeProvider
             attribute="class"
-            defaultTheme="system"
+            defaultTheme={user?.theme ?? 'system'}
             enableSystem
             disableTransitionOnChange
           >
