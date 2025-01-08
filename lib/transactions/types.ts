@@ -20,11 +20,6 @@ export interface BrianToken {
   decimals: number;
 }
 
-export interface NetworkConfig {
-  chainId: string;
-  name: string;
-}
-
 export interface BrianTransactionData {
   description: string;
   steps: BrianStep[];
@@ -36,6 +31,20 @@ export interface BrianTransactionData {
   amountToApprove?: string;
   gasCostUSD?: string;
   protocol?: string;
+}
+
+export interface ExtractedParams {
+  action?: string;
+  token1?: string;
+  token2?: string;
+  chain?: string;
+  amount?: string;
+  protocol?: string;
+  address?: string;
+  dest_chain?: string;
+  destinationChain?: string;
+  destinationAddress?: string;
+  connectedAddress?: string;
 }
 
 export interface BrianResponse {
@@ -61,14 +70,13 @@ export interface BrianResponse {
 export interface ProcessedTransaction {
   success: boolean;
   description: string;
-  transactions: TransactionStep[];
-  action: string;
-  solver: string;
+  transactions: TransactionStep[]; // Changed to BSV SDK Transaction type
+  action: TransactionAction;
+  solver?: string;
   fromToken?: BrianToken;
   toToken?: BrianToken;
   fromAmount?: string;
   toAmount?: string;
   receiver?: string;
   estimatedGas: string;
-  protocol?: string;
 }
