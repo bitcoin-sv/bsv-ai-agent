@@ -1,5 +1,5 @@
 import { Transaction, P2PKH, ARC } from '@bsv/sdk';
-
+import { BrianResponse } from './types';
 export type TransactionAction = 'swap' | 'transfer';
 
 export interface ExtractedParams {
@@ -7,13 +7,6 @@ export interface ExtractedParams {
   token1?: string;
   token2?: string;
   address?: string;
-}
-
-export interface BrianResponse {
-  action: TransactionAction;
-  extractedParams?: ExtractedParams;
-  data?: BrianTransactionData;
-  solver?: string;
 }
 
 export interface BrianTransactionData {
@@ -52,7 +45,7 @@ interface TransactionHandler {
   ): Promise<Transaction[]>;
 }
 
-class SwapHandler implements TransactionHandler {
+export class SwapHandler implements TransactionHandler {
   async processSteps(
     data: BrianTransactionData,
     params: ExtractedParams
@@ -63,13 +56,14 @@ class SwapHandler implements TransactionHandler {
       throw new Error('Missing required parameters for swap');
     }
 
-    //swap-specific implementation
-
+    // Implement swap logic here
+    // You'll need to add your specific swap implementation
+    // This is just a placeholder
     return [tx];
   }
 }
 
-class TransferHandler implements TransactionHandler {
+export class TransferHandler implements TransactionHandler {
   async processSteps(
     data: BrianTransactionData,
     params: ExtractedParams
@@ -80,10 +74,10 @@ class TransferHandler implements TransactionHandler {
       throw new Error('Missing required parameters for transfer');
     }
 
-    // standard P2PKH output for transfer
+    // Add standard P2PKH output for transfer
     tx.addOutput({
       lockingScript: new P2PKH().lock(params.address),
-      satoshis: Number.parseInt(params.amount),
+      satoshis: parseInt(params.amount),
     });
 
     return [tx];
