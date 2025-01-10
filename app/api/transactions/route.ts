@@ -1,9 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from 'next/server';
 import { transactionProcessor } from '@/lib/transactions/processor';
-import type {
-  BrianResponse,
-  BrianTransactionData,
-} from '@/lib/transactions/types';
+import type { BrianResponse } from '@/lib/transactions/types';
 
 const BRIAN_API_URL = 'https://api.brianknows.org/api/v0/agent';
 

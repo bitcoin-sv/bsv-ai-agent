@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 'use client';
 
-import { useEffect, useState, useRef, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useRef, ReactNode } from 'react';
 import type { AI, UIState } from '@/app/actions';
-import { useUIState, useActions, useAIState } from 'ai/rsc';
+import { useUIState } from 'ai/rsc';
 import { cn } from '@/lib/utils';
 import { UserMessage } from './user-message';
 import { Button } from './ui/button';
@@ -11,37 +13,59 @@ import { ArrowRight, Plus } from 'lucide-react';
 import { EmptyScreen } from './empty-screen';
 import Textarea from 'react-textarea-autosize';
 import { generateId } from 'ai';
-import { useAppState } from '@/lib/utils/app-state';
 import { ModelSelector } from './model-selector';
 import { models } from '@/lib/types/models';
 import { useLocalStorage } from '@/lib/hooks/use-local-storage';
 import { getDefaultModelId } from '@/lib/utils';
-import { toast } from 'sonner';
 import BsvButton from './bsv/BsvButton';
+
 interface ChatPanelProps {
   messages: UIState;
   query?: string;
   onModelChange?: (id: string) => void;
 }
 
+type Message = {
+  component: ReactNode;
+  id: string;
+  role: string;
+  content: string;
+  timestamp: string;
+  user: string;
+  transaction?: {
+    data: {
+      transactions: Array<{
+        contractAddress: string;
+        entrypoint: string;
+        calldata: string[];
+      }>;
+      fromToken?: any;
+      toToken?: any;
+      fromAmount?: string;
+      toAmount?: string;
+      receiver?: string;
+      gasCostUSD?: string;
+      solver?: string;
+    };
+    type: string;
+  };
+};
+
 export function ChatPanel({ messages, query, onModelChange }: ChatPanelProps) {
   const [input, setInput] = useState('');
   const [showEmptyScreen, setShowEmptyScreen] = useState(false);
   const [, setMessages] = useUIState<typeof AI>();
-  const [aiMessage, setAIMessage] = useAIState<typeof AI>();
-  const { isGenerating, setIsGenerating } = useAppState();
-  const { submit } = useActions();
-  const router = useRouter();
   const inputRef = useRef<HTMLTextAreaElement>(null);
-  const isFirstRender = useRef(true); // For development environment
+  const [textMessages, setTextMessages] = useState<Message[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const [selectedModelId, setSelectedModelId] = useLocalStorage<string>(
     'selectedModel',
     getDefaultModelId(models)
   );
 
-  const [isComposing, setIsComposing] = useState(false); // Composition state
-  const [enterDisabled, setEnterDisabled] = useState(false); // Disable Enter after composition ends
+  const [isComposing, setIsComposing] = useState(false);
+  const [enterDisabled, setEnterDisabled] = useState(false);
 
   const handleCompositionStart = () => setIsComposing(true);
 
@@ -53,103 +77,95 @@ export function ChatPanel({ messages, query, onModelChange }: ChatPanelProps) {
     }, 300);
   };
 
-  const handleQuerySubmit = useCallback(
-    async (query: string, formData?: FormData) => {
-      setInput(query);
-      setIsGenerating(true);
-
-      // Add user message to UI state
-      setMessages((currentMessages) => [
-        ...currentMessages,
-        {
-          id: generateId(),
-          component: <UserMessage message={query} />,
-        },
-      ]);
-
-      // Use existing formData or create new one
-      const data = formData || new FormData();
-
-      // Add or update the model information
-      const modelString = selectedModelId;
-      data.set('model', modelString);
-
-      // Add or update the input query if not already present
-      if (!formData) {
-        data.set('input', query);
-      }
-
-      const responseMessage = await submit(data);
-      setMessages((currentMessages) => [...currentMessages, responseMessage]);
-    },
-    [selectedModelId, setIsGenerating, setMessages, submit]
-  );
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    try {
-      await handleQuerySubmit(input, formData);
-    } catch (error) {
-      console.error('Error submitting form:', error);
-      toast.error(`${error}`);
+    if (!input.trim()) return;
 
-      handleClear();
-    }
-  };
+    const userMessage: Message = {
+      component: <UserMessage message={input} />,
+      id: generateId(),
+      role: 'user',
+      content: input,
+      timestamp: new Date().toLocaleTimeString(),
+      user: 'User',
+    };
 
-  // if query is not empty, submit the query
-  useEffect(() => {
-    if (isFirstRender.current && query && query.trim().length > 0) {
-      handleQuerySubmit(query);
-      isFirstRender.current = false;
-    }
-  }, [handleQuerySubmit, query]);
-
-  useEffect(() => {
-    const lastMessage = aiMessage.messages.slice(-1)[0];
-    if (lastMessage?.type === 'followup' || lastMessage?.type === 'inquiry') {
-      setIsGenerating(false);
-    }
-  }, [aiMessage, setIsGenerating]);
-
-  // Clear messages
-  const handleClear = () => {
-    setIsGenerating(false);
-    setMessages([]);
-    setAIMessage({ messages: [], chatId: '' });
+    setTextMessages((prev) => [...prev, userMessage]);
     setInput('');
-    router.push('/');
+    setIsLoading(true);
+
+    try {
+      const response = await fetch('/api/transactions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          prompt: input,
+          // address: address,
+          chainId: '4012',
+          messages: textMessages.concat(userMessage).map((msg) => ({
+            sender: msg.role === 'user' ? 'user' : 'brian',
+            content: msg.content,
+          })),
+        }),
+      });
+
+      const data = await response.json();
+      let agentMessage: Message;
+
+      if (
+        data.error &&
+        typeof data.error === 'string' &&
+        !data.error.includes('not recognized')
+      ) {
+        agentMessage = {
+          component: 'error',
+          id: generateId(),
+          role: 'agent',
+          content: data.error,
+          timestamp: new Date().toLocaleTimeString(),
+          user: 'Agent',
+        };
+      } else if (response.ok && data.result?.[0]?.data) {
+        const { description, transaction } = data.result[0].data;
+        agentMessage = {
+          component: 'transaction',
+          id: generateId(),
+          role: 'agent',
+          content: description,
+          timestamp: new Date().toLocaleTimeString(),
+          user: 'Agent',
+          transaction: transaction,
+        };
+      } else {
+        agentMessage = {
+          component: 'empty',
+          id: generateId(),
+          role: 'agent',
+          content:
+            "I'm sorry, I couldn't understand that. Could you try rephrasing your request? For example, you can say 'swap', 'transfer', 'deposit', or 'bridge'.",
+          timestamp: new Date().toLocaleTimeString(),
+          user: 'Agent',
+        };
+      }
+
+      setMessages((prev) => [...prev, agentMessage]);
+    } catch (error) {
+      console.error('Error:', error);
+      const errorMessage: Message = {
+        component: 'error',
+        id: generateId(),
+        role: 'agent',
+        content: 'Sorry, something went wrong. Please try again.',
+        timestamp: new Date().toLocaleTimeString(),
+        user: 'Agent',
+      };
+      setMessages((prev) => [...prev, errorMessage]);
+    } finally {
+      setIsLoading(false);
+    }
   };
-
-  useEffect(() => {
-    // focus on input when the page loads
-    inputRef.current?.focus();
-  }, []);
-
-  // If there are messages and the new button has not been pressed, display the new Button
-  if (messages.length > 0) {
-    return (
-      <div className="fixed bottom-2 md:bottom-8 left-0 right-0 flex justify-center items-center mx-auto pointer-events-none">
-        <Button
-          type="button"
-          variant={'secondary'}
-          className="rounded-full bg-secondary/80 group transition-all hover:scale-105 pointer-events-auto"
-          onClick={() => handleClear()}
-          disabled={isGenerating}
-        >
-          <span className="text-sm mr-2 group-hover:block hidden animate-in fade-in duration-300">
-            New
-          </span>
-          <Plus size={18} className="group-hover:rotate-90 transition-all" />
-        </Button>
-      </div>
-    );
-  }
-
-  if (query && query.trim().length > 0) {
-    return null;
-  }
 
   return (
     <div
@@ -183,14 +199,12 @@ export function ChatPanel({ messages, query, onModelChange }: ChatPanelProps) {
               setShowEmptyScreen(e.target.value.length === 0);
             }}
             onKeyDown={(e) => {
-              // Enter should submit the form, but disable it right after IME input confirmation
               if (
                 e.key === 'Enter' &&
                 !e.shiftKey &&
-                !isComposing && // Not in composition
-                !enterDisabled // Not within the delay after confirmation
+                !isComposing &&
+                !enterDisabled
               ) {
-                // Prevent the default action to avoid adding a new line
                 if (input.trim().length === 0) {
                   e.preventDefault();
                   return;
@@ -201,19 +215,11 @@ export function ChatPanel({ messages, query, onModelChange }: ChatPanelProps) {
               }
             }}
             onHeightChange={(height) => {
-              // Ensure inputRef.current is defined
               if (!inputRef.current) return;
-
-              // The initial height and left padding is 70px and 2rem
               const initialHeight = 70;
-              // The initial border radius is 32px
               const initialBorder = 32;
-              // The height is incremented by multiples of 20px
               const multiple = (height - initialHeight) / 20;
-
-              // Decrease the border radius by 4px for each 20px height increase
               const newBorder = initialBorder - 4 * multiple;
-              // The lowest border radius will be 8px
               inputRef.current.style.borderRadius = `${Math.max(
                 8,
                 newBorder
