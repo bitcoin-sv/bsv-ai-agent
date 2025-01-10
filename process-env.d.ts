@@ -14,6 +14,7 @@ declare global {
       readonly POSTGRES_PASSWORD: string;
       readonly POSTGRES_DATABASE: string;
       readonly CLERK_SECRET_KEY: string;
+      readonly TAAL_API_KEY: string;
       // public
       readonly NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: string;
       readonly NEXT_PUBLIC_CLERK_SIGN_IN_URL: string;
