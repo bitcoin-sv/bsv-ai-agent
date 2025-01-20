@@ -20,6 +20,7 @@ import {
 import type { Wallet } from '@/types/wallet';
 import { toast } from 'sonner';
 import { WalletDetails } from '@/components/shared/WalletDetails';
+import { getUserId } from '@/lib/actions/user';
 
 export default function WalletPage() {
   const [walletDetails, setWalletDetails] = useState<Wallet | null>(null);
@@ -35,7 +36,7 @@ export default function WalletPage() {
   const generateNewWallet = async () => {
     try {
       setLoading(true);
-      const userId = '7c3bb2a7-6759-415b-a3b8-9fea642c9c20';
+      const userId = await getUserId();
 
       const secureInfo = await createUserWallet(userId);
       const wallet = await getUserWallet(userId);
@@ -54,7 +55,9 @@ export default function WalletPage() {
         description: 'New wallet generated successfully',
       });
     } catch (err) {
-      const errorMessage = `Wallet generation failed: ${err instanceof Error ? err.message : String(err)}`;
+      const errorMessage = `Wallet generation failed: ${
+        err instanceof Error ? err.message : String(err)
+      }`;
       setError(errorMessage);
       toast.error('Error', {
         description: errorMessage,
@@ -74,7 +77,7 @@ export default function WalletPage() {
         );
       }
 
-      const userId = '7c3bb2a7-6759-415b-a3b8-9fea642c9c20';
+      const userId = await getUserId();
       const secureInfo = await recoverUserWallet(
         userId,
         recoveryInput,
@@ -93,7 +96,9 @@ export default function WalletPage() {
         description: 'Wallet recovered successfully',
       });
     } catch (err) {
-      const errorMessage = `Recovery failed: ${err instanceof Error ? err.message : String(err)}`;
+      const errorMessage = `Recovery failed: ${
+        err instanceof Error ? err.message : String(err)
+      }`;
       setError(errorMessage);
       toast.error('Error', {
         description: errorMessage,
