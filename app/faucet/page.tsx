@@ -8,19 +8,20 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { fetchUser } from '@/lib/prisma';
+import { getUserId } from '@/lib/actions/user';
 
 export default function WalletPage() {
   const [wallet, setWallet] = useState<WalletDetails | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const userId = '7c3bb2a7-6759-415b-a3b8-9fea642c9c20';
-
   useEffect(() => {
     async function fetchWallet() {
       try {
         setLoading(true);
         setError(null);
+        const userId = await getUserId();
         const fetchedWallet = await getUserWallet(userId);
 
         if (!fetchedWallet) {

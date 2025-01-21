@@ -17,9 +17,22 @@ export const Header: React.FC = async () => {
       <div className="flex gap-0.5">
         <Link
           className="px-3 py-2 hover:bg-accent hover:text-accent-foreground rounded-md transition-colors"
+          href="/wallet/dashboard"
+        >
+          Dashboard
+        </Link>
+        <Link
+          className="px-3 py-2 hover:bg-accent hover:text-accent-foreground rounded-md transition-colors"
           href="/settings"
         >
           Settings
+        </Link>
+        {}
+        <Link
+          className="px-3 py-2 hover:bg-accent hover:text-accent-foreground rounded-md transition-colors"
+          href="/admin/users"
+        >
+          Users
         </Link>
         <ModeToggle />
         <HistoryContainer location="header" />

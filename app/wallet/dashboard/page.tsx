@@ -1,9 +1,10 @@
 import { WalletDashboard } from '@/components/shared/WalletDashboard';
+import { getUserId } from '@/lib/actions/user';
 import { getUsers, getUserWallet } from '@/lib/actions/wallet';
 import { redirect } from 'next/navigation';
 
 export default async function DashboardPage() {
-  const userId = '7c3bb2a7-6759-415b-a3b8-9fea642c9c20';
+  const userId = await getUserId();
   const wallet = await getUserWallet(userId);
   const user = await getUsers();
 

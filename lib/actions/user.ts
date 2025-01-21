@@ -48,3 +48,12 @@ export const deleteUser = async () => {
   ]);
   redirect('/');
 };
+
+export const getUserId = async (): Promise<string> => {
+  const user = await fetchUser();
+  if (!user?.userId) {
+    throw new Error('User ID is undefined or user is not authenticated.');
+  }
+
+  return user.userId;
+};
