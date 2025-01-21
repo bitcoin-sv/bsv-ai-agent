@@ -1,6 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { format } from 'date-fns';
+import { Loader2, Shield, ShieldAlert, ShieldCheck } from 'lucide-react';
+import { toast } from 'sonner';
 import {
   Table,
   TableBody,
@@ -20,18 +23,24 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { toggleUserStatus, deleteUser } from '@/lib/actions/admin';
-import { format } from 'date-fns';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
-import { Loader2 } from 'lucide-react';
-import { toast } from 'sonner';
+import { deleteUser, makeUserAdmin, getAllUsers } from '@/lib/actions/admin';
 
 interface User {
   id: string;
   email: string;
   role: string;
   createdAt: Date;
-  isActive: boolean;
+  imageUrl: string;
+  theme: string;
+  updatedAt: Date;
+  userId?: string;
 }
 
 interface UsersTableProps {
@@ -43,48 +52,89 @@ export function UsersTable({ users: initialUsers }: UsersTableProps) {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [loading, setLoading] = useState<string | null>(null);
+  const [actionType, setActionType] = useState<'delete' | 'promote' | null>(
+    null
+  );
+  const [error, setError] = useState<string | null>(null);
 
-  const handleToggleStatus = async (user: User) => {
-    try {
-      setLoading(user.id);
-      await toggleUserStatus(user.id);
-      setUsers(
-        users.map((u) =>
-          u.id === user.id ? { ...u, isActive: !u.isActive } : u
-        )
-      );
-      toast.success('Success', {
-        description: `User ${user.isActive ? 'deactivated' : 'activated'} successfully`,
-      });
-    } catch (error) {
-      toast.error('Error', {
-        description: 'Failed to update user status',
-      });
-    } finally {
-      setLoading(null);
-    }
-  };
+  // Verify admin status on mount
+  useEffect(() => {
+    const verifyAdmin = async () => {
+      const response = await getAllUsers();
+      if (response.error) {
+        setError(response.error);
+      }
+    };
+    verifyAdmin();
+  }, []);
 
   const handleDelete = async () => {
     if (!selectedUser) return;
 
     try {
       setLoading(selectedUser.id);
-      await deleteUser(selectedUser.id);
+      const response = await deleteUser(selectedUser.id);
+
+      if (response.error) {
+        toast.error('Error', {
+          description: response.error,
+        });
+        return;
+      }
+
       setUsers(users.filter((u) => u.id !== selectedUser.id));
       setIsDeleteDialogOpen(false);
       toast.success('Success', {
         description: 'User deleted successfully',
       });
-    } catch (error) {
-      toast.error('Error', {
-        description: 'Failed to delete user',
+    } finally {
+      setLoading(null);
+      setSelectedUser(null);
+      setActionType(null);
+    }
+  };
+
+  const handleMakeAdmin = async () => {
+    if (!selectedUser) return;
+
+    try {
+      setLoading(selectedUser.id);
+      const response = await makeUserAdmin(selectedUser.id);
+
+      if (response.error) {
+        toast.error('Error', {
+          description: response.error,
+        });
+        return;
+      }
+
+      setUsers(
+        users.map((u) =>
+          u.id === selectedUser.id ? { ...u, role: 'admin' } : u
+        )
+      );
+      setIsDeleteDialogOpen(false);
+      toast.success('Success', {
+        description: 'User promoted to admin successfully',
       });
     } finally {
       setLoading(null);
       setSelectedUser(null);
+      setActionType(null);
     }
   };
+
+  if (error) {
+    return (
+      <div className="flex h-[400px] w-full items-center justify-center">
+        <div className="text-center">
+          <ShieldAlert className="mx-auto h-12 w-12 text-muted-foreground" />
+          <h3 className="mt-4 text-lg font-semibold">Access Denied</h3>
+          <p className="mt-2 text-sm text-muted-foreground">{error}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -96,55 +146,68 @@ export function UsersTable({ users: initialUsers }: UsersTableProps) {
               <TableHead>Email</TableHead>
               <TableHead>Role</TableHead>
               <TableHead>Registered</TableHead>
-              <TableHead>Status</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {users.map((user) => (
-              <TableRow key={user.id}>
-                <TableCell className="font-mono">{user.id}</TableCell>
+              <TableRow key={user.userId}>
+                <TableCell className="font-mono">{user.userId}</TableCell>
                 <TableCell>{user.email}</TableCell>
                 <TableCell>
                   <Badge
-                    variant={user.role === 'ADMIN' ? 'default' : 'secondary'}
+                    variant={
+                      user.role.toLowerCase() === 'admin'
+                        ? 'default'
+                        : 'secondary'
+                    }
+                    className="flex w-fit items-center gap-1"
                   >
+                    {user.role.toLowerCase() === 'admin' ? (
+                      <ShieldCheck className="h-3 w-3" />
+                    ) : (
+                      <Shield className="h-3 w-3" />
+                    )}
                     {user.role.toLowerCase()}
                   </Badge>
                 </TableCell>
                 <TableCell>{format(new Date(user.createdAt), 'PPP')}</TableCell>
-                <TableCell>
-                  <Badge variant={user.isActive ? 'default' : 'destructive'}>
-                    {user.isActive ? 'Active' : 'Inactive'}
-                  </Badge>
-                </TableCell>
+
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleToggleStatus(user)}
-                      disabled={loading === user.id}
-                    >
-                      {loading === user.id ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : user.isActive ? (
-                        'Deactivate'
-                      ) : (
-                        'Activate'
-                      )}
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => {
-                        setSelectedUser(user);
-                        setIsDeleteDialogOpen(true);
-                      }}
-                      disabled={loading === user.id}
-                    >
-                      Delete
-                    </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="outline" size="sm">
+                          More
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        {user.role.toLowerCase() !== 'admin' && (
+                          <DropdownMenuItem
+                            onClick={() => {
+                              setSelectedUser(user);
+                              setActionType('promote');
+                              setIsDeleteDialogOpen(true);
+                            }}
+                            className="text-blue-600"
+                          >
+                            <ShieldCheck className="mr-2 h-4 w-4" />
+                            Make Admin
+                          </DropdownMenuItem>
+                        )}
+                        <DropdownMenuItem
+                          onClick={() => {
+                            setSelectedUser(user);
+                            setActionType('delete');
+                            setIsDeleteDialogOpen(true);
+                          }}
+                          className="text-red-600"
+                        >
+                          <ShieldAlert className="mr-2 h-4 w-4" />
+                          Delete User
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
                 </TableCell>
               </TableRow>
@@ -159,19 +222,35 @@ export function UsersTable({ users: initialUsers }: UsersTableProps) {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogTitle>
+              {actionType === 'delete'
+                ? 'Are you absolutely sure?'
+                : 'Promote to Admin'}
+            </AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the
-              user account and remove all associated data.
+              {actionType === 'delete'
+                ? 'This action cannot be undone. This will permanently delete the user account and remove all associated data.'
+                : 'This will grant administrative privileges to this user. They will have full access to manage users and system settings.'}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleDelete}
-              className="bg-red-600 hover:bg-red-700"
+            <AlertDialogCancel
+              onClick={() => {
+                setSelectedUser(null);
+                setActionType(null);
+              }}
             >
-              Delete
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={actionType === 'delete' ? handleDelete : handleMakeAdmin}
+              className={
+                actionType === 'delete'
+                  ? 'bg-red-600 hover:bg-red-700'
+                  : 'bg-blue-600 hover:bg-blue-700'
+              }
+            >
+              {actionType === 'delete' ? 'Delete' : 'Promote'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

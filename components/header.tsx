@@ -27,6 +27,13 @@ export const Header: React.FC = async () => {
         >
           Settings
         </Link>
+        {}
+        <Link
+          className="px-3 py-2 hover:bg-accent hover:text-accent-foreground rounded-md transition-colors"
+          href="/admin/users"
+        >
+          Users
+        </Link>
         <ModeToggle />
         <HistoryContainer location="header" />
       </div>
